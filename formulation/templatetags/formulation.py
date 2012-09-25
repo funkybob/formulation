@@ -71,7 +71,7 @@ class FormNode(template.Node):
         kwargs['formulation'] = resolve_blocks(tmpl_name, context)
 
         # Render our children
-        context.update(options)
+        context.update(kwargs)
         output = self.nodelist.render(context)
         context.pop()
 
@@ -81,7 +81,7 @@ class FormNode(template.Node):
 @register.simple_tag(takes_context=True)
 def field(context, field, widget, **kwargs):
     kwargs['field'] = field
-    context.update(options)
+    context.update(kwargs)
     output = context['formulation'].get_block(widget).render(context)
     context.pop()
 
