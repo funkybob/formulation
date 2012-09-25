@@ -54,7 +54,7 @@ def form(parser, token):
 
 
 class FormNode(template.Node):
-    def __init__(self, tmpl_name, nodelist, kwargs
+    def __init__(self, tmpl_name, nodelist, kwargs):
         self.tmpl_name = tmpl_name
         self.nodelist= nodelist
         self.kwargs = kwargs
@@ -63,12 +63,12 @@ class FormNode(template.Node):
         # Resolve our arguments
         tmpl_name = self.tmpl_name.resolve(context)
         kwargs = dict(
-            (key, val.resolve(context)
+            (key, val.resolve(context))
             for key, val in self.kwargs.items()
         )
 
         # Grab the template snippets
-        kwargs['widgets'] = resolve_blocks(tmpl_name, context)
+        kwargs['formulation'] = resolve_blocks(tmpl_name, context)
 
         # Render our children
         context.update(options)
@@ -78,16 +78,21 @@ class FormNode(template.Node):
         return output
 
 
-@register.simpletag(takes_context=True)
+@register.simple_tag(takes_context=True)
 def field(context, field, widget, **kwargs):
     kwargs['field'] = field
     context.update(options)
-    output = context['widgets'].get_block(widget).render(context)
+    output = context['formulation'].get_block(widget).render(context)
     context.pop()
 
     return output
 
 
-@register.simpletag(takes_context=True)
-def use(context, widget):
-    return context['widgets'].get_block(widget).render(context)
+@register.simple_tag(takes_context=True)
+def use(context, widget, **kwargs):
+    context.push(kwargs)
+    output = context['formulation'].get_block(widget).render(context)
+    context.pop()
+
+    return output
+
