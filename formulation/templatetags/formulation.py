@@ -49,7 +49,13 @@ class TempContext(object):
 
 @register.tag
 def form(parser, token):
-    '''Open a context providing blocks from the named sniplate'''
+    '''Prepare to render a Form, using the specified template.
+
+    {% form "template.form" %}
+        {% field form.somefield "blockname" ..... %}
+        ...
+    {% endform %}
+    '''
     bits = token.split_contents()
     tag_name = bits.pop(0) # Remove the tag name
     try:
@@ -88,8 +94,9 @@ class FormNode(template.Node):
 
 
 @register.simple_tag(takes_context=True)
-def field(context, field, widget, **kwargs):
-    kwargs['field'] = field
+def field(context, widget, *fields, **kwargs):
+    kwargs['field'] = fields[0]
+    kwargs['fields'] = fields
     with TempContext(context, kwargs) as context:
         output = context['formulation'].get_block(widget).render(context)
 
