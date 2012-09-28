@@ -34,6 +34,18 @@ def resolve_blocks(template, context, blocks=None):
 
     return blocks
 
+class TempContext(object):
+    '''A context manager to make it easy to push context temporarily'''
+    def __init__(self, context, update):
+        self.context = context
+        self.update = update
+
+    def __enter__(self):
+        self.context.update(self.update)
+        return self.context
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.context.pop()
 
 @register.tag
 def form(parser, token):
@@ -71,28 +83,19 @@ class FormNode(template.Node):
         kwargs['formulation'] = resolve_blocks(tmpl_name, context)
 
         # Render our children
-        context.update(kwargs)
-        output = self.nodelist.render(context)
-        context.pop()
-
-        return output
+        with TempContext(context, kwargs) as context:
+            return self.nodelist.render(context)
 
 
 @register.simple_tag(takes_context=True)
 def field(context, field, widget, **kwargs):
     kwargs['field'] = field
-    context.update(kwargs)
-    output = context['formulation'].get_block(widget).render(context)
-    context.pop()
-
-    return output
+    with TempContext(context, kwargs) as context:
+        output = context['formulation'].get_block(widget).render(context)
 
 
 @register.simple_tag(takes_context=True)
 def use(context, widget, **kwargs):
-    context.push(kwargs)
-    output = context['formulation'].get_block(widget).render(context)
-    context.pop()
-
-    return output
+    with TempContext(context, kwargs) as context:
+        return context['formulation'].get_block(widget).render(context)
 
