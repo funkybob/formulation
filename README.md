@@ -46,3 +46,8 @@ Want more complex field types:
     {{ field.help_text }}
     {% endblock %}
 
+Thanks!
+=======
+
+Thanks to kezabelle for the name!
+
