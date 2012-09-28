@@ -11,7 +11,7 @@ First, write a template where each block is a way to render a field.
 
 We'll start with a simple one, with one hardy, general purpose field block.  Let's call it "mytemplate.form":
 
-    {% block field %}
+    {% block basic %}
     {% if not nolabel %}
     <label for="{{ field.auto_id }}" {% if field.required %}class="required"{% endif %}> {{ label|default:field.label }} </label>
     {% endif %}
@@ -25,9 +25,9 @@ Then, in your own template:
 
     <form method="POST" ... >
     {% form "mytemplate.form" %}
-    {% field form.foo 'field' %}
-    {% field form.bar 'field' nolabel=True %}
-    {% field form.baz 'field' type='email' %}
+    {% field "basic" form.foo %}
+    {% field "basic" form.bar nolabel=True %}
+    {% field "basic" form.baz type='email' %}
     {% endform %}
 
 Yep, it's that simple.
@@ -45,6 +45,12 @@ Want more complex field types:
     </select>
     {{ field.help_text }}
     {% endblock %}
+
+Also, to help with repeated block, there's the "use" tag.
+
+    {% use "other" foo="bar" baz=quux %}
+
+It works just like include, but will use a block from the current widget template.
 
 Thanks!
 =======
