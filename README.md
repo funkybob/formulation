@@ -1,11 +1,17 @@
-formulation
-===========
+# formulation
 
 Django Form rendering helper tags
 
 
-Usage
-=====
+## Overview
+
+It's fairly well accepted, now, that having the form rendering decisions in your code is less than idea.
+
+However, most template-based solutions wind up being slow, because they rely on many templates.
+
+Formulation works by defining all the widgets for your form in a single template.
+
+## Usage
 
 First, write a template where each block is a way to render a field.
 
@@ -32,6 +38,10 @@ Then, in your own template:
 
 Yep, it's that simple.
 
+The {% form %} tag loads the template, and puts its blocks in a dict in context, called 'widgets'.
+
+Each time you use the {% field %} tag, it renders the block.
+
 Want more complex field types:
 
     {% block TypedChoiceField %}
@@ -46,14 +56,23 @@ Want more complex field types:
     {{ field.help_text }}
     {% endblock %}
 
+Also, you can pass multiple form fields as positional arguments, if your widget is written to render them.
+
+    {% field "multiwidget" field1 field1 .... %}
+
+You can even use template inheritance, just as normal.
+
+### Use
+
 Also, to help with repeated block, there's the "use" tag.
 
     {% use "other" foo="bar" baz=quux %}
 
 It works just like include, but will use a block from the current widget template.
 
-Thanks!
-=======
+## Thanks!
 
 Thanks to kezabelle for the name!
+Thanks to bradleyayers for ideas on supporting multiple fields.
+
 
