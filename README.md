@@ -9,13 +9,13 @@ It's fairly well accepted, now, that having the form rendering decisions in your
 
 However, most template-based solutions wind up being slow, because they rely on many templates.
 
-Formulation works by defining all the widgets for your form in a single template.
+Formulation works by defining all the widgets for your form in a single "widget template".
 
 ## Usage
 
 First, write a template where each block is a way to render a field.
 
-We'll start with a simple one, with one hardy, general purpose field block.  Let's call it "mytemplate.form":
+We'll start with a simple one, with one hardy, general purpose field block.  Let's call it `mytemplate.form`:
 
     {% block basic %}
     {% if not nolabel %}
@@ -38,11 +38,11 @@ Then, in your own template:
 
 Yep, it's that simple.
 
-The {% form %} tag loads the template, and puts its blocks in a dict in context, called 'widgets'.
+The `{% form %}` tag loads the template, and puts its blocks in a dict in the context, called `widgets`.
 
-Each time you use the {% field %} tag, it renders the block.
+Each time you use the `{% field %}` tag, it renders the block.
 
-Want more complex field types:
+It's easy to extend this to more complex field types:
 
     {% block TypedChoiceField %}
     {% if not nolabel %}
@@ -56,23 +56,47 @@ Want more complex field types:
     {{ field.help_text }}
     {% endblock %}
 
-Also, you can pass multiple form fields as positional arguments, if your widget is written to render them.
+You can pass multiple form fields as positional arguments. They're put into a list and accessible via `fields`:
 
-    {% field "multiwidget" field1 field1 .... %}
+    # example.html
+    {% form "mytemplate.form" %}
+    {% field "multiwidget" field1 field2 ... %}
+    ...
+    {% endform %}
+    
+    # mytemplate.form
+    {% block multiwidget %}
+    {% for field in fields %}
+    ...
+    {% endfor %}
+    {% endblock %}
 
 You can even use template inheritance, just as normal.
 
-### Use
+### `{% use %}`
 
-Also, to help with repeated block, there's the "use" tag.
+You may have some chunks of templating that aren't fields, but are useful within the form.
+For these, write them as blocks in your `xyz.form` template, then use the `{% use %}` to include them:
 
-    {% use "other" foo="bar" baz=quux %}
+    # demo.html
+    {% form "demo.form %}
+    ...
+    {% use "actions" submit="Update" %}
+    {% endform %}
+
+    # demo.form
+    {% block actions %}
+    <div class="actions">
+        <input type="submit" value="{{ submit|default:"Save" }}"/>
+        <a href="/">Cancel</a>
+    </div>
+    {% endblock %}
 
 It works just like include, but will use a block from the current widget template.
 
 ## Thanks!
 
-Thanks to kezabelle for the name!
-Thanks to bradleyayers for ideas on supporting multiple fields.
+- kezabelle for the name
+- bradleyayers for ideas on supporting multiple fields.
 
 
