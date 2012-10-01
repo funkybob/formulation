@@ -5,7 +5,7 @@ Django Form rendering helper tags
 
 ## Overview
 
-It's fairly well accepted, now, that having the form rendering decisions in your code is less than idea.
+It's fairly well accepted, now, that having the form rendering decisions in your code is less than ideal.
 
 However, most template-based solutions wind up being slow, because they rely on many templates.
 
