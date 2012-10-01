@@ -40,6 +40,8 @@ Yep, it's that simple.
 
 The `{% form %}` tag loads the template, and puts its blocks in a dict in the context, called `widgets`.
 
+You can even use template inheritance, just as normal.
+
 Each time you use the `{% field %}` tag, it renders the block.
 
 It's easy to extend this to more complex field types:
@@ -71,7 +73,7 @@ You can pass multiple form fields as positional arguments. They're put into a li
     {% endfor %}
     {% endblock %}
 
-You can even use template inheritance, just as normal.
+The first field is still accessible as `field`.
 
 ### `{% use %}`
 
