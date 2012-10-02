@@ -9,7 +9,7 @@ It's fairly well accepted, now, that having the form rendering decisions in your
 
 However, most template-based solutions wind up being slow, because they rely on many templates.
 
-Formulation works by defining all the widgets for your form in a single "widget template".
+Formulation works by defining all the widgets for your form in a single "widget template", and loading it once for the form.
 
 ## Usage
 
@@ -18,10 +18,8 @@ First, write a template where each block is a way to render a field.
 We'll start with a simple one, with one hardy, general purpose field block.  Let's call it `mytemplate.form`:
 
     {% block basic %}
-    {% if not nolabel %}
-    <label for="{{ field.auto_id }}" {% if field.required %}class="required"{% endif %}> {{ label|default:field.label }} </label>
-    {% endif %}
-    <input type="{{ field_type|default:"text" }}" name="{{ field.html_name }}" id="{{ field.auto_id }}" value="{{ field.value|default:"" }}" {% if field.errors %}class="error"{% endif %} />
+    {% if not nolabel %}{{ field.label_tag }}{% endif %}
+    <input type="{{ field_type|default:"text" }}" name="{{ field.html_name }}" id="{{ field.auto_id }}" value="{{ field.value|default:"" }}" class="{{ field.css_classes }} {{ extra_classes }}" />
     {{ field.help_text }}
     {% endblock %}
 
@@ -32,17 +30,31 @@ Then, in your own template:
     <form method="POST" ... >
     {% form "mytemplate.form" %}
     {% field "basic" form.foo %}
-    {% field "basic" form.bar nolabel=True %}
+    {% field "basic" form.bar nolabel=True extra_classes="simple" %}
     {% field "basic" form.baz type='email' %}
     {% endform %}
 
-Yep, it's that simple.
+You can think of the field tag as being like `{% include %}` but for blocks.
+
+### `{% form %}`
 
 The `{% form %}` tag loads the template, and puts its blocks in a dict in the context, called `widgets`.
 
-You can even use template inheritance, just as normal.
+#### Template Inheritance
 
-Each time you use the `{% field %}` tag, it renders the block.
+You can still use {% extends %} in your widget templates, with one restriction: the template to extend MUST be known at parse time.  It may not be a variable.
+
+    # Good
+    {% extends "my/other.html" %}
+
+    # BAD - Won't work!
+    {% extends foo %}
+
+This is because when the template is loaded and the blocks resolved, there is no Context in which to resolve the variable.
+
+### `{% field %}`
+
+Each time you use the `{% field %}` tag, it renders the block specified.
 
 It's easy to extend this to more complex field types:
 
@@ -95,6 +107,18 @@ For these, write them as blocks in your `xyz.form` template, then use the `{% us
     {% endblock %}
 
 It works just like include, but will use a block from the current widget template.
+
+## Other uses
+
+Formulation is not limited to forms and fields.  There's no reason you can't also use it to abstract commonly used fragments of template code.
+
+    {% form "widgets.form" %}
+
+    {% use "framed-box" title="Some box!" %}
+
+    ...
+
+    {% endform %}
 
 ## Thanks!
 
