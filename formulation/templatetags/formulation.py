@@ -97,12 +97,14 @@ class FormNode(template.Node):
 def field(context, widget, *fields, **kwargs):
     kwargs['field'] = fields[0]
     kwargs['fields'] = fields
+    kwargs['block'] = block = context['formulation'].get_block(widget)
     with TempContext(context, kwargs) as context:
-        output = context['formulation'].get_block(widget).render(context)
+        output = block.render(context)
 
 
 @register.simple_tag(takes_context=True)
 def use(context, widget, **kwargs):
+    kwags['block'] = block = context['formulation'].get_block(widget)
     with TempContext(context, kwargs) as context:
-        return context['formulation'].get_block(widget).render(context)
+        return block.render(context)
 
