@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-VERSION = '1.0.5'
+VERSION = '1.0.5a'
 
 setup(
     name='formulation',
@@ -9,7 +9,7 @@ setup(
     author='Curtis Maloney',
     author_email='curtis@tinbrain.net',
     url='http://github.com/funkybob/formulation',
-    download_url='https://github.com/downloads/funkybob/formulation/formulation-%s.tar.gz' % VERSION,
+    download_url='https://github.com/funkybob/formulation/archive/%s.tar.gz' % VERSION,
     keywords=['django', 'forms', 'templates'],
     packages = find_packages(),
     zip_safe=False,
