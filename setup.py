@@ -1,15 +1,12 @@
 from setuptools import setup, find_packages
 
-VERSION = '1.0.5a'
-
 setup(
     name='formulation',
-    version=VERSION,
+    version='1.0.5b',
     description='Django Form rendering tool',
     author='Curtis Maloney',
     author_email='curtis@tinbrain.net',
     url='http://github.com/funkybob/formulation',
-    download_url='https://github.com/funkybob/formulation/archive/%s.tar.gz' % VERSION,
     keywords=['django', 'forms', 'templates'],
     packages = find_packages(),
     zip_safe=False,
