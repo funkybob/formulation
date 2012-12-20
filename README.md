@@ -93,7 +93,7 @@ You may have some chunks of templating that aren't fields, but are useful within
 For these, write them as blocks in your `xyz.form` template, then use the `{% use %}` to include them:
 
     # demo.html
-    {% form "demo.form %}
+    {% form "demo.form" %}
     ...
     {% use "actions" submit="Update" %}
     {% endform %}
