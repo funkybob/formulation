@@ -104,7 +104,7 @@ def field(context, widget, *fields, **kwargs):
 
 @register.simple_tag(takes_context=True)
 def use(context, widget, **kwargs):
-    kwags['block'] = block = context['formulation'].get_block(widget)
+    kwargs['block'] = block = context['formulation'].get_block(widget)
     with TempContext(context, kwargs) as context:
         return block.render(context)
 
