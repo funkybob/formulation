@@ -74,7 +74,7 @@ def form(parser, token):
 class FormNode(template.Node):
     def __init__(self, tmpl_name, nodelist, kwargs):
         self.tmpl_name = tmpl_name
-        self.nodelist= nodelist
+        self.nodelist = nodelist
         self.kwargs = kwargs
 
     def render(self, context):
