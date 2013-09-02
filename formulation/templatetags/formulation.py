@@ -36,6 +36,7 @@ def resolve_blocks(template, context, blocks=None):
 
 class TempContext(object):
     '''A context manager to make it easy to push context temporarily'''
+    # XXX Remove this once Django 1.7 lands
     def __init__(self, context, update):
         self.context = context
         self.update = update
@@ -94,17 +95,26 @@ class FormNode(template.Node):
 
 
 @register.simple_tag(takes_context=True)
-def field(context, widget, *fields, **kwargs):
-    kwargs['field'] = fields[0]
-    kwargs['fields'] = fields
-    kwargs['block'] = block = context['formulation'].get_block(widget)
+def field(context, widget, field, **kwargs):
+    field_data = {
+        'form_field': field,
+        'id': field.auto_id,
+    }
+    for attr in ('css_classes', 'errors', 'field', 'form',
+            'help_text', 'id_for_label', 'label', 'name', 'html_name',
+            'value', 'widget',):
+        field_data[attr] = getattr(field, attr)
+    if field.field.choices:
+        field_data['choices'] = field.field.choices
+    kwargs.update(field_data)
+    kwargs['block'] = context['formulation'].get_block(widget)
     with TempContext(context, kwargs) as context:
         return block.render(context)
 
 
 @register.simple_tag(takes_context=True)
 def use(context, widget, **kwargs):
-    kwargs['block'] = block = context['formulation'].get_block(widget)
+    kwargs['block'] = context['formulation'].get_block(widget)
     with TempContext(context, kwargs) as context:
         return block.render(context)
 

@@ -18,9 +18,9 @@ First, write a template where each block is a way to render a field.
 We'll start with a simple one, with one hardy, general purpose field block.  Let's call it `mytemplate.form`:
 
     {% block basic %}
-    {% if not nolabel %}{{ field.label_tag }}{% endif %}
-    <input type="{{ field_type|default:"text" }}" name="{{ field.html_name }}" id="{{ field.auto_id }}" value="{{ field.value|default:"" }}" class="{{ field.css_classes }} {{ extra_classes }}" />
-    {{ field.help_text }}
+    {% if not nolabel %}{{ form_field.label_tag }}{% endif %}
+    <input type="{{ field_type|default:"text" }}" name="{{ html_name }}" id="{{ id }}" value="{{ value|default:"" }}" class="{{ css_classes }}">
+    {{ help_text }}
     {% endblock %}
 
 Then, in your own template:
@@ -60,32 +60,16 @@ It's easy to extend this to more complex field types:
 
     {% block TypedChoiceField %}
     {% if not nolabel %}
-    <label for="{{ field.id }}" {% if field.required %}class="required"{% endif %}> {{ field.label }} </label>
+    <label for="{{ id }}" {% if required %}class="required"{% endif %}> {{ label }} </label>
     {% endif %}
-    <select name="{{ field.html_name }}" id="{{ field.auto_id }}" {% if field.errors %}class="error"{% endif %}>
-    {% for option_value, option_label in field.field.choices %}
-    <option value="{{ option_value }}" {% if field.value == option_value|safe %}selected="selected"{% endif %}>{{ option_label }}</option>
+    <select name="{{ html_name }}" id="{{ id }}" {% if errors %}class="error"{% endif %}>
+    {% for option_value, option_label in choices %}
+    <option value="{{ option_value }}" {% if value == option_value %}selected="selected"{% endif %}>{{ option_label }}</option>
     {% endfor %}
     </select>
-    {{ field.help_text }}
+    {{ help_text }}
     {% endblock %}
 
-You can pass multiple form fields as positional arguments. They're put into a list and accessible via `fields`:
-
-    # example.html
-    {% form "mytemplate.form" %}
-    {% field "multiwidget" field1 field2 ... %}
-    ...
-    {% endform %}
-    
-    # mytemplate.form
-    {% block multiwidget %}
-    {% for field in fields %}
-    ...
-    {% endfor %}
-    {% endblock %}
-
-The first field is still accessible as `field`.
 
 ### `{% use %}`
 
@@ -101,7 +85,7 @@ For these, write them as blocks in your `xyz.form` template, then use the `{% us
     # demo.form
     {% block actions %}
     <div class="actions">
-        <input type="submit" value="{{ submit|default:"Save" }}"/>
+        <input type="submit" value="{{ submit|default:"Save" }}">
         <a href="/">Cancel</a>
     </div>
     {% endblock %}
@@ -124,5 +108,5 @@ Formulation is not limited to forms and fields.  There's no reason you can't als
 
 - kezabelle for the name
 - bradleyayers for ideas on supporting multiple fields.
-
+- SmileyChris for the idea to hoik useful values off the field and into context
 
