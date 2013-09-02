@@ -6,7 +6,6 @@ setup(
     description='Django Form rendering tool',
     author='Curtis Maloney',
     author_email='curtis@tinbrain.net',
-    url='http://github.com/funkybob/formulation',
     keywords=['django', 'forms', 'templates'],
     packages = find_packages(),
     zip_safe=False,
