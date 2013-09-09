@@ -104,8 +104,8 @@ def field(context, widget, field, **kwargs):
             'help_text', 'id_for_label', 'label', 'name', 'html_name',
             'value', 'widget',):
         field_data[attr] = getattr(field, attr)
-    if field.field.choices:
-        field_data['choices'] = field.field.choices
+    for attr in ('choices', 'widget',):
+        field_data[attr] = getattr(field.field, attr)
     kwargs.update(field_data)
     kwargs['block'] = context['formulation'].get_block(widget)
     with TempContext(context, kwargs) as context:
