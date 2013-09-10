@@ -34,26 +34,28 @@ def resolve_blocks(template, context, blocks=None):
 
     return blocks
 
-class TempContext(object):
-    '''A context manager to make it easy to push context temporarily'''
-    # XXX Remove this once Django 1.7 lands
-    def __init__(self, context, update):
+
+class ContextDict(dict):
+    '''Back-port of the ContextDict from Django 1.7'''
+    def __init__(self, context, *args, **kwargs):
+        super(ContextDict, self).__init__(*args, **kwargs)
+
+        context.dicts.append(self)
         self.context = context
-        self.update = update
 
     def __enter__(self):
-        self.context.update(self.update)
-        return self.context
+        return self.context.update(self)
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(self, *args, **kwargs):
         self.context.pop()
+
 
 @register.tag
 def form(parser, token):
     '''Prepare to render a Form, using the specified template.
 
     {% form "template.form" %}
-        {% field form.somefield "blockname" ..... %}
+        {% field "blockname" form.somefield ..... %}
         ...
     {% endform %}
     '''
@@ -90,7 +92,7 @@ class FormNode(template.Node):
         kwargs['formulation'] = resolve_blocks(tmpl_name, context)
 
         # Render our children
-        with TempContext(context, kwargs) as context:
+        with ContextDict(context, kwargs) as context:
             return self.nodelist.render(context)
 
 
@@ -108,13 +110,13 @@ def field(context, widget, field, **kwargs):
         field_data[attr] = getattr(field.field, attr)
     kwargs.update(field_data)
     kwargs['block'] = context['formulation'].get_block(widget)
-    with TempContext(context, kwargs) as context:
+    with ContextDict(context, kwargs) as context:
         return block.render(context)
 
 
 @register.simple_tag(takes_context=True)
 def use(context, widget, **kwargs):
     kwargs['block'] = context['formulation'].get_block(widget)
-    with TempContext(context, kwargs) as context:
+    with ContextDict(context, kwargs) as context:
         return block.render(context)
 
