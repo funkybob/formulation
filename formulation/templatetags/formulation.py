@@ -107,7 +107,7 @@ def field(context, widget, field, **kwargs):
             'value', 'widget',):
         field_data[attr] = getattr(field, attr)
     for attr in ('choices', 'widget',):
-        field_data[attr] = getattr(field.field, attr)
+        field_data[attr] = getattr(field.field, attr, None)
     kwargs.update(field_data)
     kwargs['block'] = context['formulation'].get_block(widget)
     with ContextDict(context, kwargs) as context:
