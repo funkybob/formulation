@@ -44,7 +44,8 @@ class ContextDict(dict):
         self.context = context
 
     def __enter__(self):
-        return self.context.update(self)
+        self.context.update(self)
+        return self.context
 
     def __exit__(self, *args, **kwargs):
         self.context.pop()
@@ -95,9 +96,33 @@ class FormNode(template.Node):
         with ContextDict(context, kwargs) as context:
             return self.nodelist.render(context)
 
+def _auto_widget(field):
+    # Auto-detect
+    info = {
+        'widget': field.field.widget.__class__.__name__,
+        'field': field.field.__class__.__name__,
+        'name': field.name,
+    }
+
+    for pattern in (
+            '{field}_{widget}_{name}',
+            '{field}_{name}',
+            '{widget}_{name}',
+            '{field}_{widget}',
+            '{name}',
+            '{widget}',
+            '{field}',
+        ):
+        block = context['formulation'].get_block(
+            pattern.format(info)
+        )
+        if block is not None:
+            return block
+    raise TemplateSyntaxError("Could not find widget for field: %r" % field)
+    
 
 @register.simple_tag(takes_context=True)
-def field(context, widget, field, **kwargs):
+def field(context, field, widget=None, **kwargs):
     field_data = {
         'form_field': field,
         'id': field.auto_id,
@@ -106,9 +131,11 @@ def field(context, widget, field, **kwargs):
             'help_text', 'id_for_label', 'label', 'name', 'html_name',
             'value', 'widget',):
         field_data[attr] = getattr(field, attr)
-    for attr in ('choices', 'widget',):
+    for attr in ('choices', 'widget', 'required'):
         field_data[attr] = getattr(field.field, attr, None)
     kwargs.update(field_data)
+    if widget is None:
+        widget = _auto_widget(field)
     kwargs['block'] = context['formulation'].get_block(widget)
     with ContextDict(context, kwargs) as context:
         return block.render(context)
