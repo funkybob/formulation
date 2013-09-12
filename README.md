@@ -19,7 +19,14 @@ We'll start with a simple one, with one hardy, general purpose field block.  Let
 
     {% block basic %}
     {% if not nolabel %}{{ form_field.label_tag }}{% endif %}
-    <input type="{{ field_type|default:"text" }}" name="{{ html_name }}" id="{{ id }}" value="{{ value|default:"" }}" class="{{ css_classes }}">
+    <input
+        type="{{ field_type|default:"text" }}"
+        name="{{ html_name }}"
+        id="{{ id }}"
+        value="{{ value|default:"" }}"
+        class="{{ css_classes }}"
+        {{ required|yesno:"required," }}
+    >
     {{ help_text }}
     {% endblock %}
 
@@ -29,9 +36,8 @@ Then, in your own template:
 
     <form method="POST" ... >
     {% form "mytemplate.form" %}
-    {% field "basic" form.foo %}
-    {% field "basic" form.bar nolabel=True extra_classes="simple" %}
-    {% field "basic" form.baz type='email' %}
+    {% field form.foo "basic" %}
+    {% field form.baz "basic" type='email' %}
     {% endform %}
 
 You can think of the field tag as being like `{% include %}` but for blocks.
@@ -42,15 +48,7 @@ The `{% form %}` tag loads the template, and puts its blocks in a dict in the co
 
 #### Template Inheritance
 
-You can still use {% extends %} in your widget templates, with one restriction: the template to extend MUST be known at parse time.  It may not be a variable.
-
-    # Good
-    {% extends "my/other.html" %}
-
-    # BAD - Won't work!
-    {% extends foo %}
-
-This is because when the template is loaded and the blocks resolved, there is no Context in which to resolve the variable.
+Widget templates are just normal templates, so {% extends %} still works as expected.  This lets you define a base, common form template, and localised extensions where you need.
 
 ### `{% field %}`
 
@@ -70,6 +68,21 @@ It's easy to extend this to more complex field types:
     {{ help_text }}
     {% endblock %}
 
+### Auto-widget
+
+If you omit the widget in the {% field %} tag, formulation will try to auto-detect the block to use.  It does so by looking for the first block to match one of the following patterns:
+
+    '{field}_{widget}_{name}'
+    '{field}_{name}'
+    '{widget}_{name}'
+    '{field}_{widget}'
+    '{name}'
+    '{widget}'
+    '{field}'
+
+Where 'field' is the form field class (e.g. CharField, ChoiceField, etc), 'widget' is the widget class name (e.g. NumberInput, DateTimeInput, etc) and 'name' is the name of the field.
+
+If no block is found, a TemplateSyntaxError is raised.
 
 ### `{% use %}`
 
@@ -92,6 +105,13 @@ For these, write them as blocks in your `xyz.form` template, then use the `{% us
 
 It works just like include, but will use a block from the current widget template.
 
+## Extras
+
+There is also the `{% reuse %}` template tag, which allows you to reuse any template block within the current template [as opposed to the form widget tempalte] like a macro.  Again, it follows the same syntax as the {% include %} tag:
+
+    {% load reuse %}
+    {% reuse "otherblock" foo=1 %}
+
 ## Other uses
 
 Formulation is not limited to forms and fields.  There's no reason you can't also use it to abstract commonly used fragments of template code.
@@ -108,5 +128,5 @@ Formulation is not limited to forms and fields.  There's no reason you can't als
 
 - kezabelle for the name
 - bradleyayers for ideas on supporting multiple fields.
-- SmileyChris for the idea to hoik useful values off the field and into context
+- SmileyChris for the idea to "explode" fields into the context
 
