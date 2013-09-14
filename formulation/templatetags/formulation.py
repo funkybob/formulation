@@ -129,7 +129,7 @@ def field(context, field, widget=None, **kwargs):
     }
     for attr in ('css_classes', 'errors', 'field', 'form',
             'help_text', 'id_for_label', 'label', 'name', 'html_name',
-            'value', 'widget',):
+            'value',):
         field_data[attr] = getattr(field, attr)
     for attr in ('choices', 'widget', 'required'):
         field_data[attr] = getattr(field.field, attr, None)
