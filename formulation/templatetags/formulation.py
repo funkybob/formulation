@@ -136,7 +136,7 @@ def field(context, field, widget=None, **kwargs):
     kwargs.update(field_data)
     if widget is None:
         widget = _auto_widget(field, context)
-    kwargs['block'] = context['formulation'].get_block(widget)
+    kwargs['block'] = block = context['formulation'].get_block(widget)
     with ContextDict(context, kwargs) as context:
         return block.render(context)
 
