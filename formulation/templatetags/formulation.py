@@ -143,7 +143,7 @@ def field(context, field, widget=None, **kwargs):
 
 @register.simple_tag(takes_context=True)
 def use(context, widget, **kwargs):
-    kwargs['block'] = context['formulation'].get_block(widget)
+    kwargs['block'] = block = context['formulation'].get_block(widget)
     with ContextDict(context, kwargs) as context:
         return block.render(context)
 
