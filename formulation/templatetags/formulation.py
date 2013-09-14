@@ -96,7 +96,7 @@ class FormNode(template.Node):
         with ContextDict(context, kwargs) as context:
             return self.nodelist.render(context)
 
-def _auto_widget(field):
+def _auto_widget(field, context):
     # Auto-detect
     info = {
         'widget': field.field.widget.__class__.__name__,
@@ -135,7 +135,7 @@ def field(context, field, widget=None, **kwargs):
         field_data[attr] = getattr(field.field, attr, None)
     kwargs.update(field_data)
     if widget is None:
-        widget = _auto_widget(field)
+        widget = _auto_widget(field, context)
     kwargs['block'] = context['formulation'].get_block(widget)
     with ContextDict(context, kwargs) as context:
         return block.render(context)
