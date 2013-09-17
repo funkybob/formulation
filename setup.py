@@ -7,7 +7,10 @@ setup(
     author='Curtis Maloney',
     author_email='curtis@tinbrain.net',
     keywords=['django', 'forms', 'templates'],
-    packages = find_packages(),
+    packages = ['formulation',],
+    package_data = {
+        'formulation': ['templates/formulation/*.form',],
+    },
     zip_safe=False,
     classifiers = [
         'Environment :: Web Environment',
