@@ -46,6 +46,11 @@ You can think of the field tag as being like `{% include %}` but for blocks.
 
 The `{% form %}` tag loads the template, and puts its blocks in a dict in the context, called `widgets`.
 
+    {% form "widgets/bootstrap.form" %}
+    ...
+    {% endform %}
+
+
 #### Template Inheritance
 
 Widget templates are just normal templates, so {% extends %} still works as expected.  This lets you define a base, common form template, and localised extensions where you need.
