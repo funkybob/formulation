@@ -1,5 +1,6 @@
 
 from django import template
+from django.forms.utils import flatatt
 from django.template.base import token_kwargs
 from django.template.loader import get_template
 from django.template.loader_tags import BlockNode, ExtendsNode, BlockContext
@@ -127,9 +128,8 @@ def field(context, field, widget=None, **kwargs):
         'form_field': field,
         'id': field.auto_id,
     }
-    for attr in ('css_classes', 'errors', 'field', 'form',
-            'help_text', 'id_for_label', 'label', 'name', 'html_name',
-            'value',):
+    for attr in ('css_classes', 'errors', 'field', 'form', 'help_text',
+                'html_name', 'id_for_label', 'label', 'name', 'value',):
         field_data[attr] = getattr(field, attr)
     for attr in ('choices', 'widget', 'required'):
         field_data[attr] = getattr(field.field, attr, None)
@@ -147,3 +147,6 @@ def use(context, widget, **kwargs):
     with ContextDict(context, kwargs) as context:
         return block.render(context)
 
+@register.filter
+def flat_attrs(attrs):
+    return flatatt(attrs)
