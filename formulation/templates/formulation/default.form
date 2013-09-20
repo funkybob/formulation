@@ -1,18 +1,67 @@
 
 Default, basic form rendering
 
+# Built in fields:
 
-Helper to render attributes
-{% block _attrs %}
-{% for key, val in attrs.items %} {{key}}="{{val}}"{% endfor %}
-{% endblock %}
+    'CharField',
+    'IntegerField',
+    'DateField',
+    'TimeField',
+    'DateTimeField',
+    'TimeField',
+    'RegexField',
+    'EmailField',
+    'FileField',
+    'ImageField',
+    'URLField',
+    'BooleanField',
+    'NullBooleanField',
+    'ChoiceField',
+    'MultipleChoiceField',
+    'ComboField',
+    'MultiValueField',
+    'FloatField',
+    'DecimalField',
+    'SplitDateTimeField',
+    'IPAddressField',
+    'GenericIPAddressField',
+    'FilePathField',
+    'SlugField',
+    'TypedChoiceField',
+    'TypedMultipleChoiceField'
 
+# Built in widgets:
+
+    'TextInput',
+    'EmailInput',
+    'URLInput',
+    'NumberInput',
+    'PasswordInput',
+    'HiddenInput',
+    'MultipleHiddenInput',
+    'ClearableFileInput',
+    'FileInput',
+    'DateInput',
+    'DateTimeInput',
+    'TimeInput',
+    'Textarea',
+    'CheckboxInput',
+    'Select',
+    'NullBooleanSelect',
+    'SelectMultiple',
+    'RadioSelect',
+    'CheckboxSelectMultiple',
+    'SplitDateTimeWidget',
+    'SplitHiddenDateTimeWidget',
+
+How to render labels
 {% block _label %}
-{% if not nolabel %}<label for="{{ id }}">{{ label }}</label>{% endif %}
+{% if not nolabel %}<label id="{{ id_for_label }}" for="{{ id }}">{{ label }}</label>{% endif %}
 {% endblock %}
 
+How to render help_text
 {% block _help %}
-{% if not nohelp %}{{ help_text }}{% endif %}
+{{ help_text }}
 {% endblock %}
 
 {% block input %}
@@ -21,9 +70,9 @@ Helper to render attributes
 <input type="{{ field_type }}"
     name="{{ html_name }}"
     id="{{ id }}"
-    {% if not field_type == "password" %}value="{{ value|default:"" }}"{% endif %}
+    value="{{ value|default:"" }}"
     class="{{ css_classes }} {{ errors|yesno:"error," }}"
-    {% use "_attrs" attrs=widget.attrs %}
+    {{ widget.attrs|flat_attrs }}
     {{ required|yesno:"required," }}
     {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
 >
@@ -31,15 +80,51 @@ Helper to render attributes
 {% use "_help" %}
 {% endblock %}
 
-{% block textarea %}
+{% block TextInput %}{% use "input" %}{% endblock %}
+{% block EmailInput %}{% use "input" field_type="email" %}{% endblock %}
+{% block NumberInput %}{% use "input" field_type="number" %}{% endblock %}
+{% block EmailInput %}{% use "input" field_type="email" %}{% endblock %}
+{% block URLInput %}{% use "input" fiel_type="url" %}{% endblock %}
+{% block PasswordInput %}{% use "input" field_type="password" value="" %}{% endblock %}
+{% block HiddenInput %}{% use "input" field_type="hidden" label="" %}{% endblock %}
+{% block FileInput %}{% use "input" field_type="file" value="" %}{% endblock %}
+{% block DateInput %}{% use "input" field_type="date" %}{% endblock %}
+{% block DateTimeInput %}{% use "input" field_type="datetime" %}{% endblock %}
+{% block TimeInput %}{% use "input" field_type="time" %}{% endblock %}
+
+TODO:
+
+{% block ClearableFileInput %}{% endblock %}
+{% block CheckboxInput %}{% use "input" type="checkbox" %}{% endblock %}
+
+{% block NullBooleanSelect %}{% endblock %}
+{% block RadioSelect %}{% endblock %}
+{% block CheckboxSelectMultiple %}{% endblock %}
+{% block SplitDateTimeWidget %}{% endblock %}
+{% block SplitHiddenDateTimeWidget %}{% endblock %}
+
+Fields not derived from InputField:
+
+{% block MultipleHiddenInput %}
+{% for value in value %}
+<input type="hidden" name="{{ name }}" id="{{ id }}_{{ forloop.counter0 }}" value="{{ value }}" {{ widget.attrs|flat_attrs }} {{ required|yesno:"required," }}>
+{% endfor %}
+{% endblock %}
+
+{% block Textarea %}
 {% use "_label" %}
-<textarea name="{{ html_name }}" id="{{ id }}" {% use "_attrs" attrs=widget.attrs %} >{{ value }}</textarea>
+<textarea name="{{ html_name }}" id="{{ id }}"
+    class="{{ css_classes }} {{ errors|yesno:"error," }}"
+    {{ required|yesno:"required," }}
+    {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+    {{ widget.attrs|flat_attrs }}
+>{{ value }}</textarea>
 {% use "_help" %}
 {% endblock %}
 
-{% block select %}
+{% block Select %}
 {% use "_label" %}
-<select name="{{ html_name }}" id="{{ id }}" {% use "_attrs" attrs=widget.attrs %} >
+<select name="{{ html_name }}" id="{{ id }}" {{ widget.attrs|flat_attrs }} {{ multiple|yesno:"multiple," }}>
 {% for val, display in choices %}
     <option value="{{ val }}" {% if value == value|default:None %}selected{% endif %}>{{ display }}</option>
 {% endfor %}
@@ -47,3 +132,4 @@ Helper to render attributes
 {% use "_help" %}
 {% endblock %}
 
+{% block SelectMultiple %}{% use "Select" multiple=True %}{% endblock %}
