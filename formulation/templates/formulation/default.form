@@ -94,10 +94,9 @@ How to render help_text
 
 TODO:
 
-{% block ClearableFileInput %}{% endblock %}
+{# block ClearableFileInput %}{% endblock #}
 {% block CheckboxInput %}{% use "input" type="checkbox" %}{% endblock %}
 
-{% block NullBooleanSelect %}{% endblock %}
 {% block RadioSelect %}{% endblock %}
 {% block CheckboxSelectMultiple %}{% endblock %}
 {% block SplitDateTimeWidget %}{% endblock %}
@@ -133,3 +132,4 @@ Fields not derived from InputField:
 {% endblock %}
 
 {% block SelectMultiple %}{% use "Select" multiple=True %}{% endblock %}
+{% block NullBooleanSelect %}{% use "Select" %}{% endblock %}
