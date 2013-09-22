@@ -1,4 +1,6 @@
 # formulation
+[![Build Status](https://secure.travis-ci.org/funkybob/formulation.png?branch=master)](http://travis-ci.org/funkybob/formulation)
+
 
 Django Form rendering helper tags
 
