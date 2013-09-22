@@ -1,0 +1,7 @@
+v2.0.1
++ Added ``flat_attrs`` filter
++ Changed default template to include templates for all stock Django widgets
+- Fixed context over-stacking (#5)
+
+v2.0.0
++ Changed to explode field and widget attributes into the context
