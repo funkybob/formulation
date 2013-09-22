@@ -40,8 +40,6 @@ class ContextDict(dict):
     '''Back-port of the ContextDict from Django 1.7'''
     def __init__(self, context, *args, **kwargs):
         super(ContextDict, self).__init__(*args, **kwargs)
-
-        context.dicts.append(self)
         self.context = context
 
     def __enter__(self):
