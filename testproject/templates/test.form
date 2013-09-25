@@ -1,0 +1,13 @@
+{% load formulation %}
+
+Test template for forms.
+
+{% block input %}<input type="{{ field_type }}" name="{{ html_name }}" value="{{ value|default:"" }}">{% endblock %}
+{% block custom_input %}{% use 'input' field_type="text" %}{% endblock %}
+
+{% block CharField_TextInput_name %}auto widget CharField_TextInput_name{% endblock %}
+{% block ChoiceField_RadioSelect %}auto widget ChoiceField_RadioSelect{% endblock %}
+{% block CheckboxInput %}auto widget CheckboxInput{% endblock %}
+
+{% block use_test %}{{ test }}{% endblock %}
+{% block use_test_context %}{{ test }}{% endblock %}
