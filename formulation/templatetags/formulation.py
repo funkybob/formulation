@@ -7,6 +7,7 @@ except ImportError: # Django 1.5 compatibility
 from django.template.base import token_kwargs
 from django.template.loader import get_template
 from django.template.loader_tags import BlockNode, ExtendsNode, BlockContext
+from django.utils import six
 
 register = template.Library()
 
@@ -16,7 +17,7 @@ def resolve_blocks(template, context, blocks=None):
         blocks = BlockContext()
 
     # If it's just the name, resolve into template
-    if isinstance(template, basestring):
+    if isinstance(template, six.string_types):
         template = get_template(template)
 
     # Add this templates blocks as the first
