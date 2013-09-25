@@ -1,6 +1,9 @@
 
 from django import template
-from django.forms.utils import flatatt
+try:
+    from django.forms.utils import flatatt
+except ImportError: # Django 1.5 compatibility
+    from django.forms.util import flatatt
 from django.template.base import token_kwargs
 from django.template.loader import get_template
 from django.template.loader_tags import BlockNode, ExtendsNode, BlockContext
