@@ -1,3 +1,9 @@
+v2.0.3
+- Added tests (thanks jwa!)
+- Fixed auto widget (thanks jwa!)
++ Improved templates (thanks jwa!)
++ Began Py3 compatibility (thanks jwa!)
+
 v2.0.2
 - Fix importing of form.util(s) to make Django 1.5 compatible
 
