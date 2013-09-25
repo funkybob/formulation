@@ -1,3 +1,6 @@
+v2.0.2
+- Fix importing of form.util(s) to make Django 1.5 compatible
+
 v2.0.1
 + Added ``flat_attrs`` filter
 + Changed default template to include templates for all stock Django widgets
