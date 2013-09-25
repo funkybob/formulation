@@ -120,8 +120,8 @@ def _auto_widget(field, context):
             pattern.format(**info)
         )
         if block is not None:
-            return block
-    raise template.TemplateSyntaxError("Could not find widget for field: %r" % field)
+            break
+    return block
 
 
 @register.simple_tag(takes_context=True)
@@ -137,13 +137,14 @@ def field(context, field, widget=None, **kwargs):
         field_data[attr] = getattr(field.field, attr, None)
     kwargs.update(field_data)
     if widget is None:
-        kwargs['block'] = _auto_widget(field, context)
+        block = _auto_widget(field, context)
     else:
-        kwargs['block'] = context['formulation'].get_block(widget)
-        if kwargs['block'] is None:
-            raise template.TemplateSyntaxError("Could not find widget for field: %r" % field)
+        block = context['formulation'].get_block(widget)
+    if block is None:
+        raise template.TemplateSyntaxError("Could not find widget for field: %r" % field)
+    kwargs['block'] = block
     with ContextDict(context, kwargs) as context:
-        return kwargs['block'].render(context)
+        return block.render(context)
 
 
 @register.simple_tag(takes_context=True)
