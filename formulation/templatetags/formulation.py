@@ -136,10 +136,11 @@ def field(context, field, widget=None, **kwargs):
         field_data[attr] = getattr(field.field, attr, None)
     kwargs.update(field_data)
     if widget is None:
-        widget = _auto_widget(field, context)
-    kwargs['block'] = block = context['formulation'].get_block(widget)
+        kwargs['block'] = _auto_widget(field, context)
+    else:
+        kwargs['block'] = context['formulation'].get_block(widget)
     with ContextDict(context, kwargs) as context:
-        return block.render(context)
+        return kwargs['block'].render(context)
 
 
 @register.simple_tag(takes_context=True)
