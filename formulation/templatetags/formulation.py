@@ -120,8 +120,8 @@ def _auto_widget(field, context):
         )
         if block is not None:
             return block
-    raise TemplateSyntaxError("Could not find widget for field: %r" % field)
-    
+    raise template.TemplateSyntaxError("Could not find widget for field: %r" % field)
+
 
 @register.simple_tag(takes_context=True)
 def field(context, field, widget=None, **kwargs):
@@ -139,6 +139,8 @@ def field(context, field, widget=None, **kwargs):
         kwargs['block'] = _auto_widget(field, context)
     else:
         kwargs['block'] = context['formulation'].get_block(widget)
+        if kwargs['block'] is None:
+            raise template.TemplateSyntaxError("Could not find widget for field: %r" % field)
     with ContextDict(context, kwargs) as context:
         return kwargs['block'].render(context)
 
