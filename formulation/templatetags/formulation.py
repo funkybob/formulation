@@ -116,7 +116,7 @@ def _auto_widget(field, context):
             '{field}',
         ):
         block = context['formulation'].get_block(
-            pattern.format(info)
+            pattern.format(**info)
         )
         if block is not None:
             return block
