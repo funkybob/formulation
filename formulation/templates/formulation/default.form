@@ -107,9 +107,6 @@ How to render errors
 
 TODO:
 
-# XXX Won't set checked!
-{% block CheckboxInput %}{% use "input" type="checkbox" %}{% endblock %}
-
 {% block ClearableFileInput %}{% endblock %}
 {% block SplitDateTimeWidget %}{% endblock %}
 {% block SplitHiddenDateTimeWidget %}{% endblock %}
@@ -156,6 +153,16 @@ Fields not derived from InputField:
 {% use "_help" %}
 {% endblock %}
 {% block NullBooleanSelect %}{% use "Select" %}{% endblock %}
+
+Checkbox is a special case and needs its own template.
+{% block CheckboxInput %}
+<label for="{{ form_field.id_for_label }}" class="{{ css_classes }}">
+    <input name="{{ html_name }}" id="{{ id }}" type="checkbox" {{ form_field.value|yesno:'checked,' }}>
+    {{ form_field.label }}
+</label>
+{% use '_help' %}
+{% use '_errors' %}
+{% endblock %}
 
 {% block RadioSelect %}
 {% use "_label" %}
