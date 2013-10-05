@@ -1,3 +1,6 @@
+v2.0.4
++ Fixed date/time formatting in default template
+
 v2.0.3
 - Added tests (thanks jwa!)
 - Fixed auto widget (thanks jwa!)
