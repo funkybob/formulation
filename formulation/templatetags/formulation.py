@@ -164,9 +164,10 @@ def render_form(context, form, template, **kwargs):
     '''
 
     kwargs['form'] = form
-    kwargs['blocks'] = blocks = resolve_blocks(template, context)
+    # Add blocks so field tags will work
+    kwargs['formulation'] = blocks = resolve_blocks(template, context)
 
-    row_block = blocks['row']
+    row_block = blocks.get_block('row')
 
     rows = []
     with ContextDict(context, kwargs) as context:
@@ -176,5 +177,5 @@ def render_form(context, form, template, **kwargs):
 
     kwargs['rows'] = rows
     with ContextDict(context, kwargs) as context:
-        return blocks['form'].render(context)
+        return blocks.get_block('form').render(context)
 
