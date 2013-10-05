@@ -1,7 +1,6 @@
-from django.conf import settings
 from django import forms
-from django import template
 from django.template import Context, Template, TemplateSyntaxError
+
 from unittest import TestCase
 
 
