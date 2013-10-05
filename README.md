@@ -24,7 +24,7 @@ We'll start with a simple one, with one hardy, general purpose field block.
 Let's call it `mytemplate.form`:
 
     {% block basic %}
-    {% if not nolabel %}{{ form_field.label_tag }}{% endif %}
+    {% if label %}<label id="{{ id_for_label }}" for="{{ id }}">{{ label }}</label>{% endif %}
     <input
         type="{{ field_type|default:"text" }}"
         name="{{ html_name }}"
@@ -32,6 +32,7 @@ Let's call it `mytemplate.form`:
         value="{{ value|default:"" }}"
         class="{{ css_classes }}"
         {{ required|yesno:"required," }}
+        {{ widget.attrs|flat_attrs }}
     >
     {{ help_text }}
     {% endblock %}
@@ -46,7 +47,28 @@ Then, in your own template:
     {% field form.baz "basic" type='email' %}
     {% endform %}
 
-You can think of the field tag as being like `{% include %}` but for blocks.
+You can think of the field tag as being like `{% include %}` but for blocks.  However, it also adds many attributes from the form field into the context.
+
+The following values are take from the `BoundField`:
+
+- css_classes
+- errors
+- field
+- form
+- help_text
+- html_name
+- id_for_label
+- label
+- name
+- value
+
+And these from the `Field` itself:
+
+- choices
+- widget
+- required
+
+Any extra keyword arguments you pass to the field tag will overwrite `Field` values of the same name.
 
 ### `{% form %}`
 
