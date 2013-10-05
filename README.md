@@ -154,4 +154,4 @@ also use it to abstract commonly used fragments of template code.
 - kezabelle for the name
 - bradleyayers for ideas on supporting multiple fields.
 - SmileyChris for the idea to "explode" fields into the context
-
+- jwa for major testing and bug hunting
