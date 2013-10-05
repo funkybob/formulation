@@ -163,12 +163,8 @@ def render_form(context, form, template, **kwargs):
     Render an entire form in one go.
     '''
 
-    blocks = resolve_blocks(template, context)
-
-    kwargs = {
-        'form': form,
-        'blocks': blocks,
-    }
+    kwargs['form'] = form
+    kwargs['blocks'] = blocks = resolve_blocks(template, context)
 
     row_block = blocks['row']
 
@@ -177,6 +173,7 @@ def render_form(context, form, template, **kwargs):
         kwargs['field'] = field
         with ContextDict(context, kwargs) as context:
             rows.append(row_block.render(context))
+    del kwargs['field']
 
     kwargs['rows'] = rows
     with ContextDict(context, kwargs) as context:
