@@ -169,11 +169,10 @@ def render_form(context, form, template, **kwargs):
     row_block = blocks['row']
 
     rows = []
-    for field in form:
-        kwargs['field'] = field
-        with ContextDict(context, kwargs) as context:
+    with ContextDict(context, kwargs) as context:
+        for field in form:
+            context['field'] = field
             rows.append(row_block.render(context))
-    del kwargs['field']
 
     kwargs['rows'] = rows
     with ContextDict(context, kwargs) as context:
