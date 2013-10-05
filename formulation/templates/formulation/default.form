@@ -101,9 +101,9 @@ How to render errors
 {% block PasswordInput %}{% use "input" field_type="password" value="" %}{% endblock %}
 {% block HiddenInput %}{% use "input" field_type="hidden" label="" %}{% endblock %}
 {% block FileInput %}{% use "input" field_type="file" value="" %}{% endblock %}
-{% block DateInput %}{% use "input" field_type="date" %}{% endblock %}
-{% block DateTimeInput %}{% use "input" field_type="datetime" %}{% endblock %}
-{% block TimeInput %}{% use "input" field_type="time" %}{% endblock %}
+{% block DateInput %}{% use "input" field_type="date" value=value|date:'Y-m-d' %}{% endblock %}
+{% block DateTimeInput %}{% use "input" field_type="datetime" value=value|date:'Y-m-d H:i:s' %}{% endblock %}
+{% block TimeInput %}{% use "input" field_type="time" value=value|date:'H:i:s' %}{% endblock %}
 
 TODO:
 
