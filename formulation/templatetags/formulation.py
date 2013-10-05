@@ -156,3 +156,29 @@ def use(context, widget, **kwargs):
 @register.filter
 def flat_attrs(attrs):
     return flatatt(attrs)
+
+@register.simple_tag(takes_context=True)
+def render_form(context, form, template, **kwargs):
+    '''
+    Render an entire form in one go.
+    '''
+
+    blocks = resolve_blocks(template, context)
+
+    kwargs = {
+        'form': form,
+        'blocks': blocks,
+    }
+
+    row_block = blocks['row']
+
+    rows = []
+    for field in form:
+        kwargs['field'] = field
+        with ContextDict(context, kwargs) as context:
+            rows.append(row_block.render(context))
+
+    kwargs['rows'] = rows
+    with ContextDict(context, kwargs) as context:
+        return blocks['form'].render(context)
+
