@@ -182,6 +182,7 @@ also use it to abstract commonly used fragments of template code.
 ## Thanks!
 
 - kezabelle for the name
-- bradleyayers for ideas on supporting multiple fields.
+- bradleyayers for ideas on supporting multiple fields. (now removed)
 - SmileyChris for the idea to "explode" fields into the context
 - jwa for major testing and bug hunting
+- schinkel for packaging help
