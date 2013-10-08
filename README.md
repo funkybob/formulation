@@ -16,6 +16,14 @@ on many templates.
 Formulation works by defining all the widgets for your form in a single "widget
 template", and loading it once for the form.
 
+## Installation
+
+You can install formulation using:
+
+    $ pip install formulation
+
+You will need to add `'formulation'` to your `settings.INSTALLED_APPS`.
+
 ## Usage
 
 First, write a template where each block is a way to render a field.
