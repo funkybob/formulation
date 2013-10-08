@@ -1,6 +1,7 @@
 v2.0.5
 + Packaging fix
 + Improved docs
++ Added {% render_form %} tag
 
 v2.0.4
 + Fixed date/time formatting in default template
