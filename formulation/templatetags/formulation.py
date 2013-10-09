@@ -99,30 +99,6 @@ class FormNode(template.Node):
         with ContextDict(context, kwargs) as context:
             return self.nodelist.render(context)
 
-def _auto_widget(field, context):
-    # Auto-detect
-    info = {
-        'widget': field.field.widget.__class__.__name__,
-        'field': field.field.__class__.__name__,
-        'name': field.name,
-    }
-
-    for pattern in (
-            '{field}_{widget}_{name}',
-            '{field}_{name}',
-            '{widget}_{name}',
-            '{field}_{widget}',
-            '{name}',
-            '{widget}',
-            '{field}',
-        ):
-        block = context['formulation'].get_block(
-            pattern.format(**info)
-        )
-        if block is not None:
-            break
-    return block
-
 
 @register.simple_tag(takes_context=True)
 def field(context, field, widget=None, **kwargs):
@@ -137,7 +113,10 @@ def field(context, field, widget=None, **kwargs):
         field_data[attr] = getattr(field.field, attr, None)
     kwargs.update(field_data)
     if widget is None:
-        block = _auto_widget(field, context)
+        for name in auto_widget(field):
+            block = context['formulation'].get_block(name)
+            if block is not None:
+            break
     else:
         block = context['formulation'].get_block(widget)
     if block is None:
@@ -156,6 +135,30 @@ def use(context, widget, **kwargs):
 @register.filter
 def flat_attrs(attrs):
     return flatatt(attrs)
+
+@register.filter
+def auto_widget(field):
+    '''Return a list of widget names for the provided field.'''
+    # Auto-detect
+    info = {
+        'widget': field.field.widget.__class__.__name__,
+        'field': field.field.__class__.__name__,
+        'name': field.name,
+    }
+
+    return [
+        fmt.format(**info)
+        for fmt in (
+            '{field}_{widget}_{name}',
+            '{field}_{name}',
+            '{widget}_{name}',
+            '{field}_{widget}',
+            '{name}',
+            '{widget}',
+            '{field}',
+        )
+    ]
+
 
 @register.simple_tag(takes_context=True)
 def render_form(context, form, template, **kwargs):

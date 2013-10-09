@@ -4,7 +4,7 @@ from django import template
 register = template.Library()
 
 @register.simple_tag(takes_context=True)
-def reuse(context, block_name, **kwargs):
+def reuse(context, block_list, **kwargs):
     '''
     Allow reuse of a block within a template.
 
@@ -12,7 +12,13 @@ def reuse(context, block_name, **kwargs):
     '''
     # This must be inline to avoid circular import
     from django.template.loader_tags import BLOCK_CONTEXT_KEY
-    block = context.render_context[BLOCK_CONTEXT_KEY].get_block(block_name)
+    if not isinstance(block_name, list):
+        block_list = list(block_list)
+    block_context = context.render_context[BLOCK_CONTEXT_KEY]
+    for name in block_list:
+        block = block_context.get_block(block_name)
+        if block is not None:
+            break
     if block is None:
         return ''
     # Replace this with "with context.update()" when 1.7 lands
