@@ -8,7 +8,8 @@ def reuse(context, block_list, **kwargs):
     '''
     Allow reuse of a block within a template.
 
-    {% resuse '_myblock' foo=bar %}
+    {% reuse '_myblock' foo=bar %}
+    {% reuse list_of_template_names .... %}
     '''
     # This must be inline to avoid circular import
     from django.template.loader_tags import BLOCK_CONTEXT_KEY
