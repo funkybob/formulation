@@ -116,7 +116,7 @@ def field(context, field, widget=None, **kwargs):
         for name in auto_widget(field):
             block = context['formulation'].get_block(name)
             if block is not None:
-            break
+                break
     else:
         block = context['formulation'].get_block(widget)
     if block is None:
