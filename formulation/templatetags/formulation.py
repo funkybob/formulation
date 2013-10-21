@@ -1,4 +1,6 @@
 
+from contextlib import contextmanager
+
 from django import template
 try:
     from django.forms.utils import flatatt
@@ -40,18 +42,12 @@ def resolve_blocks(template, context, blocks=None):
     return blocks
 
 
-class ContextDict(dict):
-    '''Back-port of the ContextDict from Django 1.7'''
-    def __init__(self, context, *args, **kwargs):
-        super(ContextDict, self).__init__(*args, **kwargs)
-        self.context = context
-
-    def __enter__(self):
-        self.context.update(self)
-        return self.context
-
-    def __exit__(self, *args, **kwargs):
-        self.context.pop()
+@contextmanager
+def extra_context(context, extra):
+    '''Temporarily add some context, and clean up after ourselves.'''
+    context.update(extra)
+    yield
+    context.pop()
 
 
 @register.tag
@@ -96,7 +92,7 @@ class FormNode(template.Node):
         kwargs['formulation'] = resolve_blocks(tmpl_name, context)
 
         # Render our children
-        with ContextDict(context, kwargs) as context:
+        with extra_context(context, kwargs):
             return self.nodelist.render(context)
 
 
@@ -122,14 +118,14 @@ def field(context, field, widget=None, **kwargs):
     if block is None:
         raise template.TemplateSyntaxError("Could not find widget for field: %r" % field)
     kwargs['block'] = block
-    with ContextDict(context, kwargs) as context:
+    with extra_context(context, kwargs):
         return block.render(context)
 
 
 @register.simple_tag(takes_context=True)
 def use(context, widget, **kwargs):
     kwargs['block'] = block = context['formulation'].get_block(widget)
-    with ContextDict(context, kwargs) as context:
+    with extra_context(context, kwargs):
         return block.render(context)
 
 @register.filter
@@ -173,12 +169,12 @@ def render_form(context, form, template, **kwargs):
     row_block = blocks.get_block('row')
 
     rows = []
-    with ContextDict(context, kwargs) as context:
+    with extra_context(context, kwargs):
         for field in form:
             context['field'] = field
             rows.append(row_block.render(context))
 
     kwargs['rows'] = rows
-    with ContextDict(context, kwargs) as context:
+    with extra_context(context, kwargs):
         return blocks.get_block('form').render(context)
 
