@@ -2,6 +2,15 @@
 Extras
 ======
 
+The ``flat_attrs`` filter
+=========================
+
+This is simply a wrapper around ``from django.forms.utils import flatatt``
+
+It converts a dict of attributes into a string, in propert key="value" syntax.
+The values will be escaped, but keys will not.
+
+
 The ``reuse`` tag
 =================
 
