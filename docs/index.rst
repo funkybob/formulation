@@ -12,8 +12,11 @@ Contents:
    :maxdepth: 2
 
    tags
+   templates
    extras
    thanks
+
+   changelog
 
 Overview
 ========
