@@ -16,6 +16,8 @@ it's raw BlockNode instances.
     ...
     {% endform %}
 
+You can optionally pass the form you will be using, also.  This will allow the
+``field`` tag to reference fields by name, instead of instance.
 
 Template inheritance
 --------------------
