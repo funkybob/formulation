@@ -6,7 +6,6 @@ try:
     from django.forms.utils import flatatt
 except ImportError: # Django 1.5 compatibility
     from django.forms.util import flatatt
-from django.template.base import token_kwargs
 from django.template.loader import get_template
 from django.template.loader_tags import BlockNode, ExtendsNode, BlockContext
 from django.utils import six
@@ -54,7 +53,7 @@ def extra_context(context, extra):
 def form(parser, token):
     '''Prepare to render a Form, using the specified template.
 
-    {% form "template.form" %}
+    {% form "template.form" [form] %}
         {% field "blockname" form.somefield ..... %}
         ...
     {% endform %}
@@ -66,48 +65,61 @@ def form(parser, token):
     except IndexError:
         raise template.TemplateSyntaxError("%r tag takes at least 1 argument: the widget template" % tag_name)
 
-    kwargs = token_kwargs(bits, parser)
+    try:
+        form = parser.compile_filter(bits.pop(0))
+    except IndexError:
+        form = None
 
     nodelist = parser.parse(('endform',))
     parser.delete_first_token()
 
-    return FormNode(tmpl_name, nodelist, kwargs)
+    return FormNode(tmpl_name, nodelist, form)
 
 
 class FormNode(template.Node):
-    def __init__(self, tmpl_name, nodelist, kwargs):
+    def __init__(self, tmpl_name, nodelist, form):
         self.tmpl_name = tmpl_name
         self.nodelist = nodelist
-        self.kwargs = kwargs
+        self.form = form
 
     def render(self, context):
         # Resolve our arguments
         tmpl_name = self.tmpl_name.resolve(context)
-        kwargs = dict(
-            (key, val.resolve(context))
-            for key, val in self.kwargs.items()
-        )
+
+        form = self.form
+        if form is not None:
+            form = form.resolve(context)
 
         # Grab the template snippets
-        kwargs['formulation'] = resolve_blocks(tmpl_name, context)
+        extra = {
+            'formulation': resolve_blocks(tmpl_name, context),
+            'formulation-form': form,
+        }
 
         # Render our children
-        with extra_context(context, kwargs):
+        with extra_context(context, extra):
             return self.nodelist.render(context)
 
 
 @register.simple_tag(takes_context=True)
 def field(context, field, widget=None, **kwargs):
+    if isinstance(field, six.string_types):
+        field = context['formulation-form'][field]
+
     field_data = {
         'form_field': field,
         'id': field.auto_id,
     }
+
     for attr in ('css_classes', 'errors', 'field', 'form', 'help_text',
                 'html_name', 'id_for_label', 'label', 'name', 'value',):
         field_data[attr] = getattr(field, attr)
+
     for attr in ('choices', 'widget', 'required'):
         field_data[attr] = getattr(field.field, attr, None)
+
     kwargs.update(field_data)
+
     if widget is None:
         for name in auto_widget(field):
             block = context['formulation'].get_block(name)
@@ -115,8 +127,10 @@ def field(context, field, widget=None, **kwargs):
                 break
     else:
         block = context['formulation'].get_block(widget)
+
     if block is None:
         raise template.TemplateSyntaxError("Could not find widget for field: %r" % field)
+
     kwargs['block'] = block
     with extra_context(context, kwargs):
         return block.render(context)
