@@ -7,7 +7,7 @@ env:
     - PYTHONPATH=.
   matrix:
     - DJANGO=Django==1.5.4
-    - DJANGO=https://github.com/django/django/archive/1.6b4.zip
+    - DJANGO=Django==1.6
     - DJANGO=https://github.com/django/django/archive/master.zip
 
 install:
