@@ -49,62 +49,33 @@ def extra_context(context, extra):
     context.pop()
 
 
-@register.tag
-def form(parser, token):
-    '''Prepare to render a Form, using the specified template.
-
-    {% form "template.form" [form] %}
-        {% field "blockname" form.somefield ..... %}
-        ...
-    {% endform %}
-    '''
-    bits = token.split_contents()
-    tag_name = bits.pop(0) # Remove the tag name
-    try:
-        tmpl_name = parser.compile_filter(bits.pop(0))
-    except IndexError:
-        raise template.TemplateSyntaxError("%r tag takes at least 1 argument: the widget template" % tag_name)
-
-    try:
-        form = parser.compile_filter(bits.pop(0))
-    except IndexError:
-        form = None
-
-    nodelist = parser.parse(('endform',))
-    parser.delete_first_token()
-
-    return FormNode(tmpl_name, nodelist, form)
-
-
-class FormNode(template.Node):
-    def __init__(self, tmpl_name, nodelist, form):
-        self.tmpl_name = tmpl_name
-        self.nodelist = nodelist
-        self.form = form
-
-    def render(self, context):
-        # Resolve our arguments
-        tmpl_name = self.tmpl_name.resolve(context)
-
-        form = self.form
-        if form is not None:
-            form = form.resolve(context)
-
-        # Grab the template snippets
-        extra = {
-            'formulation': resolve_blocks(tmpl_name, context),
-            'formulation-form': form,
-        }
-
-        # Render our children
-        with extra_context(context, extra):
-            return self.nodelist.render(context)
+@register.simple_tag(takes_context=True)
+def load_widgets(context, template_name, var=None):
+    '''Load a widget set'''
+    nodelist = resolve_blocks(template_name, context)
+    if var is None:
+        var = 'default'
+    context.setdefault('widgets', {})[var] = nodelist
 
 
 @register.simple_tag(takes_context=True)
-def field(context, field, widget=None, **kwargs):
-    if isinstance(field, six.string_types):
-        field = context['formulation-form'][field]
+def widget(context, name, using=None, **kwargs):
+    '''Render a widget'''
+    if using is None:
+        using = 'default'
+
+    with extra_context(context, kwargs) as context:
+        return context['widgets'][using].render(context)
+
+
+@register.simple_tag(takes_context=True)
+def field(context, field, widget=None, using=None, form=None, **kwargs):
+    '''Render a field'''
+    if using is None:
+        using = 'default'
+
+    if isinstance(field, six.string_types) and form is not None:
+        field = form[field]
 
     field_data = {
         'form_field': field,
@@ -120,13 +91,15 @@ def field(context, field, widget=None, **kwargs):
 
     kwargs.update(field_data)
 
+    nodelist = context['widgets'][using]
+
     if widget is None:
         for name in auto_widget(field):
-            block = context['formulation'].get_block(name)
+            block = nodelist.get_block(name)
             if block is not None:
                 break
     else:
-        block = context['formulation'].get_block(widget)
+        block = nodelist.get_block(widget)
 
     if block is None:
         raise template.TemplateSyntaxError("Could not find widget for field: %r" % field)
@@ -136,14 +109,9 @@ def field(context, field, widget=None, **kwargs):
         return block.render(context)
 
 
-@register.simple_tag(takes_context=True)
-def use(context, widget, **kwargs):
-    kwargs['block'] = block = context['formulation'].get_block(widget)
-    with extra_context(context, kwargs):
-        return block.render(context)
-
 @register.filter
-def flat_attrs(attrs):
+def flatattrs(attrs):
+    '''Helpful wrapper'''
     return flatatt(attrs)
 
 @register.filter
@@ -168,27 +136,4 @@ def auto_widget(field):
             '{field}',
         )
     ]
-
-
-@register.simple_tag(takes_context=True)
-def render_form(context, form, template, **kwargs):
-    '''
-    Render an entire form in one go.
-    '''
-
-    kwargs['form'] = form
-    # Add blocks so field tags will work
-    kwargs['formulation'] = blocks = resolve_blocks(template, context)
-
-    row_block = blocks.get_block('row')
-
-    rows = []
-    with extra_context(context, kwargs):
-        for field in form:
-            context['field'] = field
-            rows.append(row_block.render(context))
-
-    kwargs['rows'] = rows
-    with extra_context(context, kwargs):
-        return blocks.get_block('form').render(context)
 
