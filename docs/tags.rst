@@ -12,6 +12,8 @@ The ``form`` tag loads the template, and puts its blocks in a dict in the
 context, called `formulation`.  You typically won't access this directly, as
 it's raw BlockNode instances.
 
+.. code-block:: html+django
+
     {% form "widgets/bootstrap.form" %}
     ...
     {% endform %}
@@ -31,6 +33,8 @@ The ``field`` tag
 =================
 
 Used to render a form field, optionally specifying the widget to use.
+
+.. code-block:: html+django
 
     {% field formfield [widget name] [key=value...] %}
 
@@ -71,13 +75,13 @@ If you omit the widget in the {% field %} tag, formulation will try to
 auto-detect the block to use.  It does so by looking for the first block to
 match one of the following patterns:
 
-    '{field}_{widget}_{name}'
-    '{field}_{name}'
-    '{widget}_{name}'
-    '{field}_{widget}'
-    '{name}'
-    '{widget}'
-    '{field}'
+- {field}_{widget}_{name}
+- {field}_{name}
+- {widget}_{name}
+- {field}_{widget}
+- {name}
+- {widget}
+- {field}
 
 Where 'field' is the form field class (e.g. CharField, ChoiceField, etc),
 'widget' is the widget class name (e.g. NumberInput, DateTimeInput, etc) and
@@ -93,17 +97,21 @@ You may have some chunks of templating that aren't fields, but are useful
 within the form.  For these, write them as blocks in your `xyz.form` template,
 then use the `{% use %}` to include them:
 
-.. code-block: html
+demo.html
+---------
 
-    # demo.html
+.. code-block:: html+django
+
     {% form "demo.form" %}
     ...
     {% use "actions" submit="Update" %}
     {% endform %}
 
-.. code-block: html
+demo.form
+---------
 
-    # demo.form
+.. code-block:: html+django
+
     {% block actions %}
     <div class="actions">
         <input type="submit" value="{{ submit|default:"Save" }}">
