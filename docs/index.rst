@@ -35,6 +35,8 @@ Installation
 
 You can install formulation using:
 
+.. code-block:: sh
+
     $ pip install formulation
 
 You will need to add `'formulation'` to your `settings.INSTALLED_APPS`.
