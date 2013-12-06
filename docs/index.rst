@@ -6,6 +6,17 @@
 Welcome to formulation's documentation!
 =======================================
 
+.. image:: https://travis-ci.org/funkybob/formulation.png
+              :target: https://secure.travis-ci.org/funkybob/formulation.png?branch=master
+
+.. image:: https://pypip.in/d/formulation/badge.png
+              :target: https://crate.io/packages/formulation
+
+.. image:: https://pypip.in/v/formulation/badge.png
+              :target: https://crate.io/packages/formulation
+
+
+
 Contents:
 
 .. toctree::
