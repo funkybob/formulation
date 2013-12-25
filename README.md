@@ -166,6 +166,8 @@ tag:
     {% load reuse %}
     {% reuse "otherblock" foo=1 %}
 
+You can also pass a list of block names to search; first found will be used.
+
 ## Other uses
 
 Formulation is not limited to forms and fields.  There's no reason you can't

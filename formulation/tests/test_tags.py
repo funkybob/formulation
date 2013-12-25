@@ -159,3 +159,36 @@ class FlatAttrsFilterTest(TemplateTestMixin, TestCase):
             self._render_string(template, context),
             """<input id="id_test" name="test">"""
         )
+
+
+class DefaultTemplateTest(TestCase):
+    """
+    Test the provided default template(s).
+
+    TODO make the tests go through all default widgets.
+
+    """
+    template = """
+        {{% load formulation %}}
+        {{% form '{}' %}}
+        {{% field form.name %}}
+        {{% field form.is_cool %}}
+        {{% endform %}}
+    """
+
+    def _render_string(self, template, context=None):
+        t = Template(template)
+        if context is None:
+            context = Context({'form': TestForm()})
+        return t.render(context)
+
+    def test_default_template(self):
+        """
+        Testing default.form template.
+
+        """
+        template = self.template.format('formulation/default.form')
+        try:
+            render = self._render_string(template)
+        except TemplateSyntaxError:
+            self.fail('Default template throws syntax error.')
