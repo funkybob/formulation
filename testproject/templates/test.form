@@ -11,3 +11,13 @@ Test template for forms.
 
 {% block use_test %}{{ test }}{% endblock %}
 {% block use_test_context %}{{ test }}{% endblock %}
+
+
+Test for proper selected value detection.
+{% block Select %}
+<select name="{{ html_name }}">
+{% for val, display in choices %}
+  <option value="{{ val }}" {% if val == value|default:'' %}selected{% endif %}>{{ display }}</option>
+{% endfor %}
+</select>
+{% endblock %}

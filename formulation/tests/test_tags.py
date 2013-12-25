@@ -1,6 +1,6 @@
 from django import forms
 from django.template import Context, Template, TemplateSyntaxError
-
+from django.test import SimpleTestCase
 from unittest import TestCase
 
 
@@ -17,6 +17,18 @@ class TestForm(forms.Form):
     )
 
 
+class SelectForm(forms.Form):
+    """
+    Form with a choice field.
+
+    """
+    CHOICES = [
+        (1, 'One'),
+        (2, 'Two'),
+    ]
+    model = forms.TypedChoiceField(choices=CHOICES)
+
+
 class TemplateTestMixin(object):
     TEMPLATE_BASE = """{{% load formulation %}}{{% form 'test.form' %}}{}{{% endform %}}"""
 
@@ -31,7 +43,7 @@ class TemplateTestMixin(object):
         return t.render(context)
 
 
-class FieldTagTest(TemplateTestMixin, TestCase):
+class FieldTagTest(TemplateTestMixin, SimpleTestCase):
     """
     Testing template tags.
 
@@ -77,6 +89,23 @@ class FieldTagTest(TemplateTestMixin, TestCase):
         self.assertEqual(
             self._render_string(template, self.context),
             """auto widget CheckboxInput"""
+        )
+
+    def test_force_text_widgets(self):
+        """
+        Model choice fields use int(value)s which will not evaluate to True
+        when compared to a str(value) of the widget.
+        This test is to make sure that previously selected fields
+        or initial data are selected correctly.
+
+        """
+        ctx = Context({'form': SelectForm(initial={
+            'model': '2'
+        })})
+        template = """{% field form.model %}"""
+        self.assertInHTML(
+            """<option value="2" selected>Two</option>""",
+            self._render_string(template, ctx)
         )
 
 

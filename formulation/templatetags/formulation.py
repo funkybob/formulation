@@ -10,6 +10,7 @@ from django.template.base import token_kwargs
 from django.template.loader import get_template
 from django.template.loader_tags import BlockNode, ExtendsNode, BlockContext
 from django.utils import six
+from django.utils.encoding import force_text
 
 register = template.Library()
 
@@ -105,8 +106,14 @@ def field(context, field, widget=None, **kwargs):
     for attr in ('css_classes', 'errors', 'field', 'form', 'help_text',
                 'html_name', 'id_for_label', 'label', 'name', 'value',):
         field_data[attr] = getattr(field, attr)
+        if callable(field_data[attr]):
+            field_data[attr] = field_data[attr]()
+        if attr == 'value' and field_data[attr]:
+            field_data[attr] = force_text(field_data[attr])
     for attr in ('choices', 'widget', 'required'):
         field_data[attr] = getattr(field.field, attr, None)
+        if attr == 'choices' and field_data[attr]:
+            field_data[attr] = [(force_text(k), v) for (k, v) in field_data[attr]]
     kwargs.update(field_data)
     if widget is None:
         for name in auto_widget(field):

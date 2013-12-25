@@ -135,7 +135,7 @@ Fields not derived from InputField:
 {% use "_label" %}
 <select name="{{ html_name }}" id="{{ id }}" {{ widget.attrs|flat_attrs }}>
 {% for val, display in choices %}
-    <option value="{{ val }}" {% if value == value|default:None %}selected{% endif %}>{{ display }}</option>
+    <option value="{{ val }}" {% if val == value|default:None %}selected{% endif %}>{{ display }}</option>
 {% endfor %}
 </select>
 {% use "_help" %}
@@ -156,7 +156,7 @@ Fields not derived from InputField:
 Checkbox is a special case and needs its own template.
 {% block CheckboxInput %}
 <label for="{{ form_field.id_for_label }}" class="{{ css_classes }}">
-    <input name="{{ html_name }}" id="{{ id }}" type="checkbox" {{ form_field.value|yesno:'checked,' }}>
+    <input name="{{ html_name }}" id="{{ id }}" type="checkbox" value="{{ form_field.value }}" {{ form_field.value|yesno:'checked,' }}>
     {{ form_field.label }}
 </label>
 {% use '_help' %}
