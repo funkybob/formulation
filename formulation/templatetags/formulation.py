@@ -9,6 +9,7 @@ except ImportError: # Django 1.5 compatibility
 from django.template.loader import get_template
 from django.template.loader_tags import BlockNode, ExtendsNode, BlockContext
 from django.utils import six
+from django.utils.encoding import force_text
 
 register = template.Library()
 
@@ -117,6 +118,8 @@ def field(context, field, widget=None, **kwargs):
 
     for attr in ('choices', 'widget', 'required'):
         field_data[attr] = getattr(field.field, attr, None)
+        if attr == 'choices' and field_data[attr]:
+            field_data[attr] = [(force_text(k), v) for (k, v) in field_data[attr]]
 
     kwargs.update(field_data)
 
