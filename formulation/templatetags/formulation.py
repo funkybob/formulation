@@ -23,10 +23,10 @@ def resolve_blocks(template, context, blocks=None):
         template = get_template(template)
 
     # Add this templates blocks as the first
-    local_blocks = dict(
-        (block.name, block)
+    local_blocks = {
+        block.name: block
         for block in template.nodelist.get_nodes_by_type(BlockNode)
-    )
+    }
     blocks.add_blocks(local_blocks)
 
     # Do we extend a parent template?
