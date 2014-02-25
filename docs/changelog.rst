@@ -2,6 +2,23 @@
 Changelog
 =========
 
+v2.0.7
+======
+
+Bugs Fixed:
+
+- Fixed renamed variables in reuse tag
+- Fixed testing current value in Select widget template
+- Fixed value in Checkbox widget template
+- force_text on choices values
+
+Enhancements:
+
++ Improved documentation
++ Improved test coverage
+
+Thanks to jwa
+
 v2.0.6
 ======
 
