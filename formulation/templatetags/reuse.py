@@ -13,11 +13,11 @@ def reuse(context, block_list, **kwargs):
     '''
     # This must be inline to avoid circular import
     from django.template.loader_tags import BLOCK_CONTEXT_KEY
-    if not isinstance(block_name, list):
+    if not isinstance(block_list, list):
         block_list = list(block_list)
     block_context = context.render_context[BLOCK_CONTEXT_KEY]
     for name in block_list:
-        block = block_context.get_block(block_name)
+        block = block_context.get_block(name)
         if block is not None:
             break
     if block is None:
