@@ -18,13 +18,11 @@ def reuse(context, block_list, **kwargs):
     if not isinstance(block_list, list):
         block_list = [block_list]
 
-    print "block list: %r" % (block_list,)
     for name in block_list:
         block = block_context.get_block(name)
         if block is not None:
             break
 
-    print "block %r" % (block,)
     if block is None:
         return ''
 
