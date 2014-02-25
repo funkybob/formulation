@@ -2,6 +2,13 @@
 Changelog
 =========
 
+v2.0.7.1
+========
+
+Bugs Fixed:
+
+- Change list() to [] to not turn strings into lists
+
 v2.0.7
 ======
 
