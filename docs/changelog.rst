@@ -2,6 +2,13 @@
 Changelog
 =========
 
+v2.0.7.2
+========
+
+Enhancements:
+
++ Add py2.6 support back
+
 v2.0.7.1
 ========
 
