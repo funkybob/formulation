@@ -30,7 +30,7 @@ class SelectForm(forms.Form):
 
 
 class TemplateTestMixin(object):
-    TEMPLATE_BASE = """{{% load formulation %}}{{% form 'test.form' %}}{}{{% endform %}}"""
+    TEMPLATE_BASE = """{{% load formulation %}}{{% form 'test.form' %}}{0}{{% endform %}}"""
 
     @classmethod
     def setUpClass(cls):
@@ -170,7 +170,7 @@ class DefaultTemplateTest(TestCase):
     """
     template = """
         {{% load formulation %}}
-        {{% form '{}' %}}
+        {{% form '{0}' %}}
         {{% field form.name %}}
         {{% field form.is_cool %}}
         {{% endform %}}
