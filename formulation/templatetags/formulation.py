@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from django import template
 try:
     from django.forms.utils import flatatt
-except ImportError: # Django 1.5 compatibility
+except ImportError:  # Django 1.5 compatibility
     from django.forms.util import flatatt
 from django.template.loader import get_template
 from django.template.loader_tags import BlockNode, ExtendsNode, BlockContext
@@ -12,6 +12,7 @@ from django.utils import six
 from django.utils.encoding import force_text
 
 register = template.Library()
+
 
 def resolve_blocks(template, context, blocks=None):
     '''Get all the blocks from this template, accounting for 'extends' tags'''
@@ -60,7 +61,7 @@ def form(parser, token):
     {% endform %}
     '''
     bits = token.split_contents()
-    tag_name = bits.pop(0) # Remove the tag name
+    tag_name = bits.pop(0)  # Remove the tag name
     try:
         tmpl_name = parser.compile_filter(bits.pop(0))
     except IndexError:
@@ -145,9 +146,11 @@ def use(context, widget, **kwargs):
     with extra_context(context, kwargs):
         return block.render(context)
 
+
 @register.filter
 def flat_attrs(attrs):
     return flatatt(attrs)
+
 
 @register.filter
 def auto_widget(field):
@@ -194,4 +197,3 @@ def render_form(context, form, template, **kwargs):
     kwargs['rows'] = rows
     with extra_context(context, kwargs):
         return blocks.get_block('form').render(context)
-
