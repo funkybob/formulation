@@ -3,6 +3,7 @@ from django import template
 
 register = template.Library()
 
+
 @register.simple_tag(takes_context=True)
 def reuse(context, block_list, **kwargs):
     '''
@@ -31,4 +32,3 @@ def reuse(context, block_list, **kwargs):
     content = block.render(context)
     context.pop()
     return content
-
