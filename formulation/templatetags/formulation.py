@@ -121,6 +121,9 @@ def field(context, field, widget=None, **kwargs):
         field_data[attr] = getattr(field.field, attr, None)
         if attr == 'choices' and field_data[attr]:
             field_data[attr] = [(force_text(k), v) for (k, v) in field_data[attr]]
+            # Normalize the value, see django.forms.widgets.Select.render_options
+            field_data['value'] = force_text(field_data['value']())
+
 
     kwargs.update(field_data)
 
