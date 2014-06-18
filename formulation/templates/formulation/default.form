@@ -96,7 +96,7 @@ How to render errors
 {% block TextInput %}{% use "input" %}{% endblock %}
 {% block EmailInput %}{% use "input" field_type="email" %}{% endblock %}
 {% block NumberInput %}{% use "input" field_type="number" %}{% endblock %}
-{% block URLInput %}{% use "input" fiel_type="url" %}{% endblock %}
+{% block URLInput %}{% use "input" field_type="url" %}{% endblock %}
 {% block PasswordInput %}{% use "input" field_type="password" value="" %}{% endblock %}
 {% block HiddenInput %}{% use "input" field_type="hidden" label="" %}{% endblock %}
 {% block FileInput %}{% use "input" field_type="file" value="" %}{% endblock %}
