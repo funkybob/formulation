@@ -27,6 +27,8 @@ class SelectForm(forms.Form):
         (2, 'Two'),
     ]
     model = forms.TypedChoiceField(choices=CHOICES)
+    radio = forms.TypedChoiceField(choices=CHOICES, widget=forms.RadioSelect)
+    multiple = forms.TypedMultipleChoiceField(choices=CHOICES)
 
 
 class TemplateTestMixin(object):
@@ -98,15 +100,43 @@ class FieldTagTest(TemplateTestMixin, SimpleTestCase):
         This test is to make sure that previously selected fields
         or initial data are selected correctly.
 
+        The value of the widget is also normalized, test the widgets where this
+        applies.
+
         """
-        ctx = Context({'form': SelectForm(initial={
-            'model': '2'
-        })})
+        # Test the select widget
+        initial1 = {
+            'model': 2,
+            'radio': 1,
+            'multiple': [1, 2]
+        }
+        initial2 = {
+            'model': '2',
+            'radio': '1',
+            'multiple': ['1', '2']
+        }
+        ctx1 = Context({'form': SelectForm(initial=initial1)})
+        ctx2 = Context({'form': SelectForm(initial=initial2)})
+
         template = """{% field form.model %}"""
-        self.assertInHTML(
-            """<option value="2" selected>Two</option>""",
-            self._render_string(template, ctx)
-        )
+        expected_html = """<option value="2" selected>Two</option>"""
+        self.assertInHTML(expected_html, self._render_string(template, ctx1))
+        self.assertInHTML(expected_html, self._render_string(template, ctx2))
+
+        # Test radio's
+        template = """{% field form.radio %}"""
+        expected_html = """<label><input type="radio" id="id_radio_0" value="1" checked>One</label>"""
+        self.assertInHTML(expected_html, self._render_string(template, ctx1))
+        self.assertInHTML(expected_html, self._render_string(template, ctx2))
+
+        # Test multiple
+        template = """{% field form.multiple %}"""
+        expected_html1 = """<option value="1" selected>One</option>"""
+        expected_html2 = """<option value="2" selected>Two</option>"""
+        self.assertInHTML(expected_html1, self._render_string(template, ctx1))
+        self.assertInHTML(expected_html2, self._render_string(template, ctx1))
+        self.assertInHTML(expected_html1, self._render_string(template, ctx2))
+        self.assertInHTML(expected_html2, self._render_string(template, ctx2))
 
 
 class UseTagTest(TemplateTestMixin, TestCase):
