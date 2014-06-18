@@ -7,17 +7,19 @@ try:
 except ImportError:  # Django 1.5 compatibility
     from django.forms.util import flatatt
 from django.template.loader import get_template
-from django.template.loader_tags import BlockNode, ExtendsNode, BlockContext
+from django.template.loader_tags import BlockNode, ExtendsNode, BlockContext, BLOCK_CONTEXT_KEY
 from django.utils import six
 from django.utils.encoding import force_text
 
 register = template.Library()
 
 
-def resolve_blocks(template, context, blocks=None):
+def resolve_blocks(template, context):
     '''Get all the blocks from this template, accounting for 'extends' tags'''
-    if blocks is None:
-        blocks = BlockContext()
+    try:
+        blocks = context.render_context[BLOCK_CONTEXT_KEY]
+    except KeyError:
+        blocks = context.render_context[BLOCK_CONTEXT_KEY] = BlockContext()
 
     # If it's just the name, resolve into template
     if isinstance(template, six.string_types):
@@ -38,7 +40,7 @@ def resolve_blocks(template, context, blocks=None):
 
         # Get the parent, and recurse
         parent_template = extends_node.get_parent(context)
-        resolve_blocks(parent_template, context, blocks)
+        resolve_blocks(parent_template, context)
 
     return blocks
 
