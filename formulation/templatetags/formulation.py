@@ -7,7 +7,9 @@ try:
 except ImportError:  # Django 1.5 compatibility
     from django.forms.util import flatatt
 from django.template.loader import get_template
-from django.template.loader_tags import BlockNode, ExtendsNode, BlockContext, BLOCK_CONTEXT_KEY
+from django.template.loader_tags import (
+    BlockNode, ExtendsNode, BlockContext, BLOCK_CONTEXT_KEY,
+)
 from django.utils import six
 from django.utils.encoding import force_text
 
@@ -67,7 +69,8 @@ def form(parser, token):
     try:
         tmpl_name = parser.compile_filter(bits.pop(0))
     except IndexError:
-        raise template.TemplateSyntaxError("%r tag takes at least 1 argument: the widget template" % tag_name)
+        raise template.TemplateSyntaxError("%r tag takes at least 1 argument: "
+                                           "the widget template" % tag_name)
 
     try:
         form = parser.compile_filter(bits.pop(0))
@@ -116,16 +119,18 @@ def field(context, field, widget=None, **kwargs):
     }
 
     for attr in ('css_classes', 'errors', 'field', 'form', 'help_text',
-                'html_name', 'id_for_label', 'label', 'name', 'value',):
+                 'html_name', 'id_for_label', 'label', 'name', 'value',):
         field_data[attr] = getattr(field, attr)
 
     for attr in ('choices', 'widget', 'required'):
         field_data[attr] = getattr(field.field, attr, None)
         if attr == 'choices' and field_data[attr]:
-            field_data[attr] = [(force_text(k), v) for (k, v) in field_data[attr]]
-            # Normalize the value, see django.forms.widgets.Select.render_options
+            field_data[attr] = [
+                (force_text(k), v)
+                for k, v in field_data[attr]
+            ]
+            # Normalize the value [django.forms.widgets.Select.render_options]
             field_data['value'] = force_text(field_data['value']())
-
 
     kwargs.update(field_data)
 
