@@ -2,6 +2,15 @@
 Changelog
 =========
 
+v2.0.8
+======
+
+Bugs Fixed:
+
+- Ensure value is a comparable type in choices widgets
+- Fixed default widget for select types to include display string
+- Allow {{ block.super }} to work
+
 v2.0.7.1
 ========
 
