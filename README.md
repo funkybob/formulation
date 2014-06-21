@@ -31,6 +31,8 @@ First, write a template where each block is a way to render a field.
 We'll start with a simple one, with one hardy, general purpose field block.
 Let's call it `mytemplate.form`:
 
+    {% load formulation %}
+    
     {% block basic %}
     {% if label %}<label id="{{ id_for_label }}" for="{{ id }}">{{ label }}</label>{% endif %}
     <input
