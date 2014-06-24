@@ -7,17 +7,21 @@ try:
 except ImportError:  # Django 1.5 compatibility
     from django.forms.util import flatatt
 from django.template.loader import get_template
-from django.template.loader_tags import BlockNode, ExtendsNode, BlockContext
+from django.template.loader_tags import (
+    BlockNode, ExtendsNode, BlockContext, BLOCK_CONTEXT_KEY,
+)
 from django.utils import six
 from django.utils.encoding import force_text
 
 register = template.Library()
 
 
-def resolve_blocks(template, context, blocks=None):
+def resolve_blocks(template, context):
     '''Get all the blocks from this template, accounting for 'extends' tags'''
-    if blocks is None:
-        blocks = BlockContext()
+    try:
+        blocks = context.render_context[BLOCK_CONTEXT_KEY]
+    except KeyError:
+        blocks = context.render_context[BLOCK_CONTEXT_KEY] = BlockContext()
 
     # If it's just the name, resolve into template
     if isinstance(template, six.string_types):
@@ -38,7 +42,7 @@ def resolve_blocks(template, context, blocks=None):
 
         # Get the parent, and recurse
         parent_template = extends_node.get_parent(context)
-        resolve_blocks(parent_template, context, blocks)
+        resolve_blocks(parent_template, context)
 
     return blocks
 
@@ -65,7 +69,8 @@ def form(parser, token):
     try:
         tmpl_name = parser.compile_filter(bits.pop(0))
     except IndexError:
-        raise template.TemplateSyntaxError("%r tag takes at least 1 argument: the widget template" % tag_name)
+        raise template.TemplateSyntaxError("%r tag takes at least 1 argument: "
+                                           "the widget template" % tag_name)
 
     try:
         form = parser.compile_filter(bits.pop(0))
@@ -114,13 +119,18 @@ def field(context, field, widget=None, **kwargs):
     }
 
     for attr in ('css_classes', 'errors', 'field', 'form', 'help_text',
-                'html_name', 'id_for_label', 'label', 'name', 'value',):
+                 'html_name', 'id_for_label', 'label', 'name', 'value',):
         field_data[attr] = getattr(field, attr)
 
     for attr in ('choices', 'widget', 'required'):
         field_data[attr] = getattr(field.field, attr, None)
         if attr == 'choices' and field_data[attr]:
-            field_data[attr] = [(force_text(k), v) for (k, v) in field_data[attr]]
+            field_data[attr] = [
+                (force_text(k), v)
+                for k, v in field_data[attr]
+            ]
+            # Normalize the value [django.forms.widgets.Select.render_options]
+            field_data['value'] = force_text(field_data['value']())
 
     kwargs.update(field_data)
 

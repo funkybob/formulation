@@ -2,12 +2,15 @@
 Changelog
 =========
 
-v2.0.7.2
-========
+=======
+v2.0.8
+======
 
-Enhancements:
+Bugs Fixed:
 
-+ Add py2.6 support back
+- Ensure value is a comparable type in choices widgets
+- Fixed default widget for select types to include display string
+- Allow {{ block.super }} to work
 
 v2.0.7.1
 ========
