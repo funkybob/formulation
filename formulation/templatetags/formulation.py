@@ -132,7 +132,9 @@ def field(context, field, widget=None, **kwargs):
             # Normalize the value [django.forms.widgets.Select.render_options]
             field_data['value'] = force_text(field_data['value']())
 
-    kwargs.update(field_data)
+
+    # Allow supplied values to override field data
+    field_data.update(kwargs)
 
     if widget is None:
         for name in auto_widget(field):
@@ -145,8 +147,8 @@ def field(context, field, widget=None, **kwargs):
     if block is None:
         raise template.TemplateSyntaxError("Could not find widget for field: %r" % field)
 
-    kwargs['block'] = block
-    with extra_context(context, kwargs):
+    field_data['block'] = block
+    with extra_context(context, field_data):
         return block.render(context)
 
 
