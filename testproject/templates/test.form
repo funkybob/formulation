@@ -39,3 +39,5 @@ Tests for proper selected value detection.
 {% endblock %}
 
 {% block Inherited %}foo{% endblock %}
+
+{% block RecurringNode %}foo{% endblock %}

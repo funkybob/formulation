@@ -224,7 +224,7 @@ class DefaultTemplateTest(TestCase):
             self.fail('Default template throws syntax error.')
 
 
-class InheritanceTest(TemplateTestMixin, TestCase):
+class InheritanceTest(TemplateTestMixin, SimpleTestCase):
     """ Test that extending and block inheritance work correctly """
     TEMPLATE_BASE = """{{% load formulation %}}{{% form 'test2.form' %}}{0}{{% endform %}}"""
 
@@ -234,3 +234,27 @@ class InheritanceTest(TemplateTestMixin, TestCase):
             self._render_string(template, self.context),
             """foobar"""
         )
+
+
+class MultipleFormsTest(TemplateTestMixin, SimpleTestCase):
+    """
+    Test that multiple forms don't pollute each other.
+
+    This is a regression test, since 2.0.8 block.super is possible, but
+    context pollution happened causing the wrong blocks to be rendered.
+    """
+    TEMPLATE_BASE = "{0}"
+
+    def test_multiple_forms(self):
+        template = """
+            {% load formulation %}
+            {% form 'test.form' %}
+            {% field form.name 'RecurringNode' %}
+            {% endform %}
+            {% form 'test2.form' %}
+            {% field form.name 'RecurringNode' %}
+            {% endform %}
+        """
+        rendered = self._render_string(template, self.context)
+        self.assertIn('foo', rendered)
+        self.assertIn('bar', rendered)
