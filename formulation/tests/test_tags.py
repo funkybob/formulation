@@ -222,3 +222,15 @@ class DefaultTemplateTest(TestCase):
             render = self._render_string(template)
         except TemplateSyntaxError:
             self.fail('Default template throws syntax error.')
+
+
+class InheritanceTest(TemplateTestMixin, TestCase):
+    """ Test that extending and block inheritance work correctly """
+    TEMPLATE_BASE = """{{% load formulation %}}{{% form 'test2.form' %}}{0}{{% endform %}}"""
+
+    def test_inherited_form(self):
+        template = """{% field form.name 'Inherited' %}"""
+        self.assertEqual(
+            self._render_string(template, self.context),
+            """foobar"""
+        )
