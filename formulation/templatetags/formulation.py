@@ -1,5 +1,6 @@
 
 from contextlib import contextmanager
+from copy import copy
 
 from django import template
 try:
@@ -97,9 +98,13 @@ class FormNode(template.Node):
         if form is not None:
             form = form.resolve(context)
 
+        safe_context = copy(context)
+        # Get a fresh, clean BlockContext
+        context.render_context[BLOCK_CONTEXT_KEY] = BlockContext()
         # Grab the template snippets
+
         extra = {
-            'formulation': resolve_blocks(tmpl_name, context),
+            'formulation': resolve_blocks(tmpl_name, safe_context),
             'formulation-form': form,
         }
 
@@ -186,26 +191,3 @@ def auto_widget(field):
             '{field}',
         )
     ]
-
-
-@register.simple_tag(takes_context=True)
-def render_form(context, form, template, **kwargs):
-    '''
-    Render an entire form in one go.
-    '''
-
-    kwargs['form'] = form
-    # Add blocks so field tags will work
-    kwargs['formulation'] = blocks = resolve_blocks(template, context)
-
-    row_block = blocks.get_block('row')
-
-    rows = []
-    with extra_context(context, kwargs):
-        for field in form:
-            context['field'] = field
-            rows.append(row_block.render(context))
-
-    kwargs['rows'] = rows
-    with extra_context(context, kwargs):
-        return blocks.get_block('form').render(context)
