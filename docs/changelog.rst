@@ -2,6 +2,15 @@
 Changelog
 =========
 
+v2.0.9
+======
+
+Bugs Fixed:
+
+- Fix dirty BlockContext issue introduced in 2.0.8 [Thanks Sergei Maertens]
+- Removed undocumented render_form
+
+
 v2.0.8
 ======
 
