@@ -1,6 +1,6 @@
 
 from contextlib import contextmanager
-from copy import copy
+from copy import copy, deepcopy
 
 from django import template
 try:
@@ -99,9 +99,9 @@ class FormNode(template.Node):
             form = form.resolve(context)
 
         safe_context = copy(context)
-        # Get a fresh, clean BlockContext
-        context.render_context[BLOCK_CONTEXT_KEY] = BlockContext()
-        # Grab the template snippets
+        # make a deep copy, otherwise the render_context[BLOCK_CONTEXT_KEY] gets reset,
+        # if a new BlockContext is instantiated, dropping blocks that follow {% form %} tags.
+        safe_context.render_context = deepcopy(context.render_context)
 
         extra = {
             'formulation': resolve_blocks(tmpl_name, safe_context),
@@ -109,8 +109,8 @@ class FormNode(template.Node):
         }
 
         # Render our children
-        with extra_context(context, extra):
-            return self.nodelist.render(context)
+        with extra_context(safe_context, extra):
+            return self.nodelist.render(safe_context)
 
 
 @register.simple_tag(takes_context=True)
