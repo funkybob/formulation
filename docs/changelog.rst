@@ -2,6 +2,13 @@
 Changelog
 =========
 
+v2.0.10
+=======
+
+Bugs Fixed:
+
+- One more change to BlockContext handling. [More thanks to Sergei Maertens]
+
 v2.0.9
 ======
 
