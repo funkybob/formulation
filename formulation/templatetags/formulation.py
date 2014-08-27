@@ -102,6 +102,7 @@ class FormNode(template.Node):
         # make a deep copy, otherwise the render_context[BLOCK_CONTEXT_KEY] gets reset,
         # if a new BlockContext is instantiated, dropping blocks that follow {% form %} tags.
         safe_context.render_context = deepcopy(context.render_context)
+        save_context.render_context[BLOCK_CONTEXT_KEY] = BlockContext()
 
         extra = {
             'formulation': resolve_blocks(tmpl_name, safe_context),
