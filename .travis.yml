@@ -1,28 +1,26 @@
 language: python
 python:
-  - "2.6"
   - "2.7"
   - "3.3"
+  - "3.4"
+  - "pypy"
 env:
-  global:
-    - PYTHONPATH=.
-  matrix:
-    - DJANGO=Django==1.5.8
-    - DJANGO=Django==1.6.5
-    - DJANGO=https://github.com/django/django/archive/stable/1.7.x.zip
+  - DJANGO=Django==1.5.9
+  - DJANGO=Django==1.6.6
+  - DJANGO=https://github.com/django/django/archive/stable/1.7.x.zip
 
 install:
-  - "pip install $DJANGO --use-mirrors"
+  - pip install $DJANGO --use-mirrors
 
 before_script:
   - sh -c "if [ '$DJANGO' = 'Django==1.5.8' ]; then pip install django-discover-runner; fi"
 
 script:
-  - python testproject/manage.py test
+  - python runtests.py
 
 matrix:
   exclude:
-    - env: DJANGO=https://github.com/django/django/archive/stable/1.7.x.zip
-      python: "2.6"
-    - env: DJANGO=Django==1.5.8
+    - env: DJANGO=Django==1.5.9
       python: "3.3"
+    - env: DJANGO=Django==1.5.9
+      python: "3.4"
