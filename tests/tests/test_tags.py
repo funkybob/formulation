@@ -4,8 +4,6 @@ from django.template.loader import get_template
 from django.test import SimpleTestCase
 from django.test.utils import setup_test_template_loader, restore_template_loaders
 
-from unittest import TestCase
-
 
 class TestForm(forms.Form):
     """
@@ -193,7 +191,7 @@ Tests for proper selected value detection.
         self.assertInHTML(expected_html2, template.render(ctx2))
 
 
-class UseTagTest(TemplateTestMixin, TestCase):
+class UseTagTest(TemplateTestMixin, SimpleTestCase):
     """
     Tests for the {% use %} tag.
 
@@ -228,7 +226,7 @@ class UseTagTest(TemplateTestMixin, TestCase):
         self.assertEqual(template.render(context), 'use tag test')
 
 
-class FlatAttrsFilterTest(TemplateTestMixin, TestCase):
+class FlatAttrsFilterTest(TemplateTestMixin, SimpleTestCase):
     """
     Make sure our flatattrs filter works.
 
@@ -253,7 +251,7 @@ class FlatAttrsFilterTest(TemplateTestMixin, TestCase):
         self.assertEqual(template.render(context), """<input id="id_test" name="test">""")
 
 
-class DefaultTemplateTest(TestCase):
+class DefaultTemplateTest(SimpleTestCase):
     """
     Test the provided default template(s).
 
