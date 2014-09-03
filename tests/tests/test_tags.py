@@ -1,6 +1,9 @@
 from django import forms
 from django.template import Context, Template, TemplateSyntaxError
+from django.template.loader import get_template
 from django.test import SimpleTestCase
+from django.test.utils import setup_test_template_loader, restore_template_loaders
+
 from unittest import TestCase
 
 
@@ -32,64 +35,115 @@ class SelectForm(forms.Form):
 
 
 class TemplateTestMixin(object):
-    TEMPLATE_BASE = """{{% load formulation %}}{{% form 'test.form' %}}{0}{{% endform %}}"""
+    TEMPLATE_BASE = '''{{% load formulation %}}{{% form 'test.form' %}}{}{{% endform %}}'''
+    TEMPLATES = {}
+    PARTIALS = {}
 
     @classmethod
     def setUpClass(cls):
         cls.context = Context({'form': TestForm()})
+        for key, tmpl in cls.PARTIALS.items():
+            cls.TEMPLATES[key] = cls.TEMPLATE_BASE.format(tmpl)
+        setup_test_template_loader(cls.TEMPLATES)
 
-    def _render_string(self, template, context=None):
-        t = Template(self.TEMPLATE_BASE.format(template))
-        if context is None:
-            context = Context()
-        return t.render(context)
+    @classmethod
+    def tearDownClass(cls):
+        restore_template_loaders()
 
+STOCK_TEMPLATE = '''{{% load formulation %}}{{% form 'test.form' %}}{}{{% endform %}}'''
 
 class FieldTagTest(TemplateTestMixin, SimpleTestCase):
     """
     Testing template tags.
-
     """
+
+    TEMPLATES = {
+        'test.form': '''
+{% load formulation %}
+{% block input %}<input type="{{ field_type }}" name="{{ html_name }}" value="{{ value|default:"" }}">{% endblock %}
+{% block custom_input %}{% use 'input' field_type="text" %}{% endblock %}
+
+{% block CharField_TextInput_name %}auto widget CharField_TextInput_name{% endblock %}
+{% block ChoiceField_RadioSelect %}auto widget ChoiceField_RadioSelect{% endblock %}
+{% block CheckboxInput %}auto widget CheckboxInput{% endblock %}
+
+{% block use_test %}{{ test }}{% endblock %}
+{% block use_test_context %}{{ test }}{% endblock %}
+
+Tests for proper selected value detection.
+{% block Select %}
+<select name="{{ html_name }}">
+{% for val, display in choices %}
+  <option value="{{ val }}" {% if val == value|default:'' %}selected{% endif %}>{{ display }}</option>
+{% endfor %}
+</select>
+{% endblock %}
+
+{% block SelectMultiple %}
+<select name="{{ html_name }}" multiple>
+{% for val, display in choices %}
+    <option value="{{ val }}" {% if val in value %}selected{% endif %}>{{ display }}</option>
+{% endfor %}
+</select>
+{% endblock %}
+
+{% block RadioSelect %}
+<ul id="{{ id }}">
+{% for val, display in choices %}
+    <li><label><input type="radio" id="{{ id}}_{{ forloop.counter0 }}" value="{{ val }}" {% if val == value|default:"" %}checked{% endif %}>{{ display }}</label></li>
+{% endfor %}
+</ul>
+{% endblock %}
+
+        ''',
+    }
+    PARTIALS = {
+        'use_correct_block': "{% field form.name 'custom_input' %}",
+        'unknown_block': "{% field form.name 'does_not_exist' %}",
+        'auto_widget1': "{% field form.name %}",
+        'auto_widget2': "{% field form.gender %}",
+        'auto_widget3': "{% field form.is_cool %}",
+        'force_text_widgets1': "{% field form.model %}",
+        'force_text_widgets2': "{% field form.radio %}",
+        'force_text_widgets3': "{% field form.multiple %}",
+    }
+
     def test_use_correct_block(self):
         """
         Make sure the field tag uses the right block specified.
-
         """
-        template = """{% field form.name 'custom_input' %}"""
-        self.assertEqual(
-            self._render_string(template, self.context),
-            """<input type="text" name="name" value="">"""
-        )
+        template = get_template('use_correct_block')
+        result = template.render(self.context)
+        self.assertEqual(result, """<input type="text" name="name" value="">""")
 
     def test_unknown_block(self):
         """
         Trying to render a block that doesn't exist raises an error.
-
         """
-        template = """{% field form.name 'does_not_exist' %}"""
+        template = get_template('unknown_block')
         with self.assertRaises(TemplateSyntaxError):
-            self._render_string(template, self.context)
+            template.render(self.context)
 
     def test_auto_widget(self):
         """
         Choose the correct widget according to the form field.
 
         """
-        template = """{% field form.name %}"""
+        template = get_template('auto_widget1')
         self.assertEqual(
-            self._render_string(template, self.context),
+            template.render(self.context),
             """auto widget CharField_TextInput_name"""
         )
 
-        template = """{% field form.gender %}"""
+        template = get_template('auto_widget2')
         self.assertEqual(
-            self._render_string(template, self.context),
+            template.render(self.context),
             """auto widget ChoiceField_RadioSelect"""
         )
 
-        template = """{% field form.is_cool %}"""
+        template = get_template('auto_widget3')
         self.assertEqual(
-            self._render_string(template, self.context),
+            template.render(self.context),
             """auto widget CheckboxInput"""
         )
 
@@ -118,25 +172,25 @@ class FieldTagTest(TemplateTestMixin, SimpleTestCase):
         ctx1 = Context({'form': SelectForm(initial=initial1)})
         ctx2 = Context({'form': SelectForm(initial=initial2)})
 
-        template = """{% field form.model %}"""
+        template = get_template('force_text_widgets1')
         expected_html = """<option value="2" selected>Two</option>"""
-        self.assertInHTML(expected_html, self._render_string(template, ctx1))
-        self.assertInHTML(expected_html, self._render_string(template, ctx2))
+        self.assertInHTML(expected_html, template.render(ctx1))
+        self.assertInHTML(expected_html, template.render(ctx2))
 
         # Test radio's
-        template = """{% field form.radio %}"""
+        template = get_template('force_text_widgets2')
         expected_html = """<label><input type="radio" id="id_radio_0" value="1" checked>One</label>"""
-        self.assertInHTML(expected_html, self._render_string(template, ctx1))
-        self.assertInHTML(expected_html, self._render_string(template, ctx2))
+        self.assertInHTML(expected_html, template.render(ctx1))
+        self.assertInHTML(expected_html, template.render(ctx2))
 
         # Test multiple
-        template = """{% field form.multiple %}"""
+        template = get_template('force_text_widgets3')
         expected_html1 = """<option value="1" selected>One</option>"""
         expected_html2 = """<option value="2" selected>Two</option>"""
-        self.assertInHTML(expected_html1, self._render_string(template, ctx1))
-        self.assertInHTML(expected_html2, self._render_string(template, ctx1))
-        self.assertInHTML(expected_html1, self._render_string(template, ctx2))
-        self.assertInHTML(expected_html2, self._render_string(template, ctx2))
+        self.assertInHTML(expected_html1, template.render(ctx1))
+        self.assertInHTML(expected_html2, template.render(ctx1))
+        self.assertInHTML(expected_html1, template.render(ctx2))
+        self.assertInHTML(expected_html2, template.render(ctx2))
 
 
 class UseTagTest(TemplateTestMixin, TestCase):
@@ -144,28 +198,34 @@ class UseTagTest(TemplateTestMixin, TestCase):
     Tests for the {% use %} tag.
 
     """
+
+    TEMPLATES = {
+        'test.form': '''
+{% block use_test %}{{ test }}{% endblock %}
+{% block use_test_context %}{{ test }}{% endblock %}
+        ''',
+    }
+    PARTIALS = {
+        'use_tag': "{% use 'use_test' test='use tag test' %}",
+        'use_tag_inherits_context': "{% use 'use_test_context' %}",
+    }
+
     def test_use_tag(self):
         """
         Basic use tag usage.
 
         """
-        template = """{% use 'use_test' test='use tag test' %}"""
-        self.assertEqual(
-            self._render_string(template),
-            """use tag test"""
-        )
+        template = get_template('use_tag')
+        self.assertEqual(template.render(self.context), "use tag test")
 
     def test_use_tag_inherits_context(self):
         """
         Use tag should inherit context.
 
         """
-        template = """{% use 'use_test_context' %}"""
+        template = get_template('use_tag_inherits_context')
         context = Context({'test': 'use tag test'})
-        self.assertEqual(
-            self._render_string(template, context),
-            """use tag test"""
-        )
+        self.assertEqual(template.render(context), 'use tag test')
 
 
 class FlatAttrsFilterTest(TemplateTestMixin, TestCase):
@@ -173,6 +233,11 @@ class FlatAttrsFilterTest(TemplateTestMixin, TestCase):
     Make sure our flatattrs filter works.
 
     """
+    TEMPLATES = {
+        'test.form': '''
+''',
+        'flat_attrs_filter': STOCK_TEMPLATE.format("""<input{{ attrs|flat_attrs }}>"""),
+    }
     def test_flat_attrs_filter(self):
         """
         Flat attrs filter does what it's supposed to do.
@@ -180,15 +245,12 @@ class FlatAttrsFilterTest(TemplateTestMixin, TestCase):
         NOTE: Attributes are sorted alphabetically.
 
         """
-        template = """<input{{ attrs|flat_attrs }}>"""
+        template = get_template('flat_attrs_filter')
         context = Context({'attrs': {
             'name': 'test',
             'id': 'id_test',
         }})
-        self.assertEqual(
-            self._render_string(template, context),
-            """<input id="id_test" name="test">"""
-        )
+        self.assertEqual(template.render(context), """<input id="id_test" name="test">""")
 
 
 class DefaultTemplateTest(TestCase):
@@ -226,14 +288,26 @@ class DefaultTemplateTest(TestCase):
 
 class InheritanceTest(TemplateTestMixin, SimpleTestCase):
     """ Test that extending and block inheritance work correctly """
-    TEMPLATE_BASE = """{{% load formulation %}}{{% form 'test2.form' %}}{0}{{% endform %}}"""
+    TEMPLATE_BASE = '''{{% load formulation %}}{{% form 'test2.form' %}}{}{{% endform %}}'''
+    TEMPLATES = {
+        'test.form': '''
+{% load formulation %}
+{% block Inherited %}foo{% endblock %}
+        ''',
+        'test2.form': '''
+{% extends "test.form" %}
+{% load formulation %}
+
+{% block Inherited %}{{ block.super }}bar{% endblock %}
+        ''',
+    }
+    PARTIALS = {
+        'inherited_form': '''{% field form.name 'Inherited' %}''',
+    }
 
     def test_inherited_form(self):
-        template = """{% field form.name 'Inherited' %}"""
-        self.assertEqual(
-            self._render_string(template, self.context),
-            """foobar"""
-        )
+        template = get_template('inherited_form')
+        self.assertEqual(template.render(self.context), 'foobar')
 
 
 class MultipleFormsTest(TemplateTestMixin, SimpleTestCase):
@@ -244,9 +318,15 @@ class MultipleFormsTest(TemplateTestMixin, SimpleTestCase):
     context pollution happened causing the wrong blocks to be rendered.
     """
     TEMPLATE_BASE = "{0}"
-
-    def test_multiple_forms(self):
-        template = """
+    TEMPLATES = {
+        'test.form': '''
+{% block RecurringNode %}foo{% endblock %}
+        ''',
+        'test2.form': '''
+{% extends 'test.form' %}
+{% block RecurringNode %}bar{% endblock %}
+        ''',
+        'multiple_forms': '''
             {% load formulation %}
             {% form 'test.form' %}
             {% field form.name 'RecurringNode' %}
@@ -254,7 +334,11 @@ class MultipleFormsTest(TemplateTestMixin, SimpleTestCase):
             {% form 'test2.form' %}
             {% field form.name 'RecurringNode' %}
             {% endform %}
-        """
-        rendered = self._render_string(template, self.context)
+        ''',
+    }
+
+    def test_multiple_forms(self):
+        template = get_template('multiple_forms')
+        rendered = template.render(self.context)
         self.assertIn('foo', rendered)
         self.assertIn('bar', rendered)
