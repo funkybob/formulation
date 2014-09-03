@@ -1,6 +1,0 @@
-{% extends "test.form" %}
-{% load formulation %}
-
-{% block Inherited %}{{ block.super }}bar{% endblock %}
-
-{% block RecurringNode %}bar{% endblock %}
