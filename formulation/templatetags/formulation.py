@@ -1,6 +1,6 @@
 
 from contextlib import contextmanager
-from copy import copy, deepcopy
+from copy import copy
 
 from django import template
 try:
@@ -99,9 +99,11 @@ class FormNode(template.Node):
             form = form.resolve(context)
 
         safe_context = copy(context)
-        # make a deep copy, otherwise the render_context[BLOCK_CONTEXT_KEY] gets reset,
-        # if a new BlockContext is instantiated, dropping blocks that follow {% form %} tags.
-        safe_context.render_context = deepcopy(context.render_context)
+        # Since render_context is derived from BaseContext, a simple copy will
+        # will wind up with the same stack of dicts.
+        safe_context.render_context = safe_context.render_context.new({
+            BLOCK_CONTEXT_KEY: BlockContext(),
+        })
 
         extra = {
             'formulation': resolve_blocks(tmpl_name, safe_context),
@@ -136,7 +138,6 @@ def field(context, field, widget=None, **kwargs):
             ]
             # Normalize the value [django.forms.widgets.Select.render_options]
             field_data['value'] = force_text(field_data['value']())
-
 
     # Allow supplied values to override field data
     field_data.update(kwargs)
