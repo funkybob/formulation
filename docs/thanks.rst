@@ -8,3 +8,4 @@ Thanks
 - jwa for major testing and bug hunting
 - schinkel for packaging help
 - mbrochh for inspiring the name lookup idea
+- Sergei Maertens for helping fix the leaky render context
