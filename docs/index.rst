@@ -3,8 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to formulation's documentation!
-=======================================
+Formulation
+===========
+
+.. rubric:: Putting form rendering in its place.
 
 .. image:: https://travis-ci.org/funkybob/formulation.png
               :target: https://secure.travis-ci.org/funkybob/formulation.png?branch=master
@@ -14,7 +16,6 @@ Welcome to formulation's documentation!
 
 .. image:: https://pypip.in/v/formulation/badge.png
               :target: https://crate.io/packages/formulation
-
 
 
 Contents:
@@ -36,7 +37,7 @@ It's fairly well accepted, now, that having the form rendering decisions in
 your code is less than ideal.
 
 However, most template-based solutions wind up being slow, because they rely
-on many templates.
+on many templates per form.
 
 Formulation works by defining all the widgets for your form in a single "widget
 template", and loading it once for the form.
