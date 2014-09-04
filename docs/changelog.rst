@@ -2,6 +2,14 @@
 Changelog
 =========
 
+v2.0.11
+=======
+
+Bugs Fixed:
+
+- Use the "new" method of request_context instead of deep copy. [Fixes #23]
+- Refactor tests to make easier to run
+
 v2.0.10
 =======
 
