@@ -151,7 +151,9 @@ def field(context, field, widget=None, **kwargs):
         block = context['formulation'].get_block(widget)
 
     if block is None:
-        raise template.TemplateSyntaxError("Could not find widget for field: %r" % field)
+        raise template.TemplateSyntaxError(
+            "No widget for field: %s (%r)" % (field.name, field.field)
+        )
 
     field_data['block'] = block
     with extra_context(context, field_data):
