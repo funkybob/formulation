@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='formulation',
-    version='2.0.10',
+    version='2.0.11',
     description='Django Form rendering tool',
     author='Curtis Maloney',
     author_email='curtis@tinbrain.net',
