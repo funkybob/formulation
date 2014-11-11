@@ -100,7 +100,7 @@ class FormNode(template.Node):
 
         safe_context = copy(context)
         # Since render_context is derived from BaseContext, a simple copy will
-        # will wind up with the same stack of dicts.
+        # wind up with the same stack of dicts.
         safe_context.render_context = safe_context.render_context.new({
             BLOCK_CONTEXT_KEY: BlockContext(),
         })
