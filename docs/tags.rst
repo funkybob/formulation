@@ -21,6 +21,9 @@ it's raw BlockNode instances.
 You can optionally pass the form you will be using, also.  This will allow the
 ``field`` tag to reference fields by name, instead of instance.
 
+.. note:: There is a default form template, called "formulation/default.form",
+   provided that should emulate the stock Django widgets.
+
 Template inheritance
 --------------------
 
