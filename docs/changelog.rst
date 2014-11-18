@@ -2,6 +2,15 @@
 Changelog
 =========
 
+v2.0.12
+=======
+
+Features added:
+
+- Added "widget_type" and "field_type" to exploded field data.
+- Added "display" value to exploded field data for fields with choices.
+- Move 'choices' handling out of inner loop
+
 v2.0.11
 =======
 
