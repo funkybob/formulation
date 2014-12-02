@@ -147,16 +147,21 @@ def field(context, field, widget=None, **kwargs):
     field_data.update(kwargs)
 
     if widget is None:
-        for name in auto_widget(field):
-            block = context['formulation'].get_block(name)
-            if block is not None:
-                break
+        widgets = auto_widget(field)
     else:
-        block = context['formulation'].get_block(widget)
+        widget = [widget]
+    for name in widgets:
+        block = context['formulation'].get_block(name)
+        if block is not None:
+            break
 
     if block is None:
         raise template.TemplateSyntaxError(
-            "No widget for field: %s (%r)" % (field.name, field.field)
+            "No widget for field: %s (%r) [Tried: %s]" % (
+                field.name,
+                field.field,
+                widgets
+            )
         )
 
     field_data['block'] = block
