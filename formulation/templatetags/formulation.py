@@ -149,7 +149,7 @@ def field(context, field, widget=None, **kwargs):
     if widget is None:
         widgets = auto_widget(field)
     else:
-        widget = [widget]
+        widgets = [widget]
     for name in widgets:
         block = context['formulation'].get_block(name)
         if block is not None:
