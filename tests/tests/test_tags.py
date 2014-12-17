@@ -30,6 +30,7 @@ class SelectForm(forms.Form):
     model = forms.TypedChoiceField(choices=CHOICES)
     radio = forms.TypedChoiceField(choices=CHOICES, widget=forms.RadioSelect)
     multiple = forms.TypedMultipleChoiceField(choices=CHOICES)
+    gender = forms.MultipleChoiceField(choices=(('male', 'male'), ('female', 'female')))
 
 
 class TemplateTestMixin(object):
@@ -104,6 +105,7 @@ Tests for proper selected value detection.
         'force_text_widgets1': "{% field form.model %}",
         'force_text_widgets2': "{% field form.radio %}",
         'force_text_widgets3': "{% field form.multiple %}",
+        'force_text_widgets4': "{% field form.gender %}",
     }
 
     def test_use_correct_block(self):
@@ -167,8 +169,15 @@ Tests for proper selected value detection.
             'radio': '1',
             'multiple': ['1', '2']
         }
+        initial3 = {
+            'model': '2',
+            'radio': '1',
+            'multiple': ['1'], # single option
+            'gender': ['female']
+        }
         ctx1 = Context({'form': SelectForm(initial=initial1)})
         ctx2 = Context({'form': SelectForm(initial=initial2)})
+        ctx3 = Context({'form': SelectForm(initial=initial3)})
 
         template = get_template('force_text_widgets1')
         expected_html = """<option value="2" selected>Two</option>"""
@@ -189,6 +198,12 @@ Tests for proper selected value detection.
         self.assertInHTML(expected_html2, template.render(ctx1))
         self.assertInHTML(expected_html1, template.render(ctx2))
         self.assertInHTML(expected_html2, template.render(ctx2))
+
+        template = get_template('force_text_widgets4')
+        expected_multiple = """<option value="female" selected>female</option>"""
+        expected_multiple2 = """<option value="male">male</option>"""
+        self.assertInHTML(expected_multiple, template.render(ctx3))
+        self.assertInHTML(expected_multiple2, template.render(ctx3))
 
 
 class UseTagTest(TemplateTestMixin, SimpleTestCase):
