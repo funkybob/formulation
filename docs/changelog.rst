@@ -12,6 +12,11 @@ Features added:
 - Move 'choices' handling out of inner loop
 - Improve error message when widget can't be found.
 
+Bugs Fixed:
+
+- Fixed handling of multi-value fields
+- Fixed default values for 'value' in default template.
+
 v2.0.11
 =======
 
