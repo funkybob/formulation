@@ -114,7 +114,7 @@ Fields not derived from InputField:
 
 {% block MultipleHiddenInput %}
 {% for value in value %}
-<input type="hidden" name="{{ name }}" id="{{ id }}_{{ forloop.counter0 }}" value="{{ value }}" {{ widget.attrs|flat_attrs }} {{ required|yesno:"required," }}>
+<input type="hidden" name="{{ name }}" id="{{ id }}_{{ forloop.counter0 }}" value="{{ value|default:'' }}" {{ widget.attrs|flat_attrs }} {{ required|yesno:"required," }}>
 {% endfor %}
 {% endblock %}
 
@@ -126,7 +126,7 @@ Fields not derived from InputField:
     {{ autofocus|yesno:"autofocus," }}
     {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
     {{ widget.attrs|flat_attrs }}
->{{ value }}</textarea>
+>{{ value|default:'' }}</textarea>
 {% use "_help" %}
 {% use "_errors" %}
 {% endblock %}
