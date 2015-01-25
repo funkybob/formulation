@@ -16,6 +16,10 @@ class TestForm(forms.Form):
         label="Gender",
         widget=forms.RadioSelect()
     )
+    hidden_gender = forms.ChoiceField(
+        widget=forms.HiddenInput,
+        choices=[('m', 'male'), ('f', 'female')]
+    )
 
 
 class SelectForm(forms.Form):
@@ -65,6 +69,7 @@ class FieldTagTest(TemplateTestMixin, SimpleTestCase):
 {% block CharField_TextInput_name %}auto widget CharField_TextInput_name{% endblock %}
 {% block ChoiceField_RadioSelect %}auto widget ChoiceField_RadioSelect{% endblock %}
 {% block CheckboxInput %}auto widget CheckboxInput{% endblock %}
+{% block HiddenInput %}{{ value|default:"" }}{% endblock %}
 
 {% block use_test %}{{ test }}{% endblock %}
 {% block use_test_context %}{{ test }}{% endblock %}
@@ -106,6 +111,7 @@ Tests for proper selected value detection.
         'force_text_widgets2': "{% field form.radio %}",
         'force_text_widgets3': "{% field form.multiple %}",
         'force_text_widgets4': "{% field form.gender %}",
+        'hidden_choicefield': "{% field form.hidden_gender %}",
     }
 
     def test_use_correct_block(self):
@@ -204,6 +210,20 @@ Tests for proper selected value detection.
         expected_multiple2 = """<option value="male">male</option>"""
         self.assertInHTML(expected_multiple, template.render(ctx3))
         self.assertInHTML(expected_multiple2, template.render(ctx3))
+
+    def test_force_text_on_None(self):
+        """
+        Tests that form field values like `None` and `False` pass correctly
+        through the `default` filter.
+
+        When `force_text` is applied to `None`, the value gets passed as string
+        and is no longer caught by the `default` template filter. This is an
+        issue with (Typed|Model)ChoiceField derivatives using a HiddenInput.
+        """
+        context = Context({'form': TestForm()})
+        template = get_template('hidden_choicefield')
+        rendered = template.render(context)
+        self.assertEqual(rendered, u'')
 
 
 class UseTagTest(TemplateTestMixin, SimpleTestCase):
