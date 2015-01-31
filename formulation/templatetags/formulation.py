@@ -140,14 +140,15 @@ def field(context, field, widget=None, **kwargs):
             (force_text(k), v)
             for k, v in field_data['choices']
         ]
+
         # Normalize the value [django.forms.widgets.Select.render_options]
         value = field_data['value']()
         if value is None:  # don't force_text these
             field_data['value'] = value
+        elif isinstance(value, (list, tuple)):
+            field_data['value'] = [force_text(v) for v in value]
         else:
-            field_data['value'] = ([force_text(v) for v in value]
-                                   if isinstance(value, (list, tuple))
-                                   else force_text(value))
+            field_data['value'] = force_text(value)
 
     # Allow supplied values to override field data
     field_data.update(kwargs)
