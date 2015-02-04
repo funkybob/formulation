@@ -2,6 +2,14 @@
 Changelog
 =========
 
+v2.0.13
+=======
+
+Bugs Fixed:
+
+- Make field tag less agressive about applying force_text to values
+  [Thanks Sergei Martens]
+
 v2.0.12
 =======
 
