@@ -124,7 +124,7 @@ def field(context, field, widget=None, **kwargs):
         'form_field': field,
         'id': field.auto_id,
         'widget_type': field.field.widget.__class__.__name__,
-        'field_type': field.field.__class__.__name__,
+        'field_class': field.field.__class__.__name__,
     }
 
     for attr in ('css_classes', 'errors', 'field', 'form', 'help_text',
