@@ -4,6 +4,9 @@
 
 Django Form rendering helper tags
 
+# NOTE: Formulation stops with Django 1.7
+
+For continuing support please migrate to django-sniplates.
 
 ## Overview
 
